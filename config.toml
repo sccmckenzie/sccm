@@ -9,10 +9,9 @@ hasCJKLanguage = false
 
 # Added to theme
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+
 [permalinks]
     post = "/:slug/"
-
-
 
 [params]
 	author = "sccm"
