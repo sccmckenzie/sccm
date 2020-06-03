@@ -4,6 +4,7 @@ hidden: true
 title: About
 ---
 
+<!--
 Welcome to my website! This is where I showcase ideas that have inspired me on my data science journey. 
 
 I originally earned my B.S. in Mechanical Engineering from Texas A&M University. Several years later, I discovered the wonderful open-source world of&nbsp;R. Together, my industry persective and passion for data science have charted an exciting path - one that I hope to chronicle here.
@@ -30,7 +31,7 @@ This entails:
 <td style = "position: relative; vertical-align: middle; background: #fff; border-top: none">
 In my spare time, I enjoy planning long road-trips to the mountains. I am also an avid cellist in the <a href="http://austincivicorchestra.org/">Austin Civic Orchestra</a>.
 </td>
-<td style = "width: 350px; background: #fff; border-top: none">
+<td style = "width: 40%; background: #fff; border-top: none">
 <img src = "/cello.png">
 </td>
 </tr>
@@ -38,3 +39,4 @@ In my spare time, I enjoy planning long road-trips to the mountains. I am also a
 
 ![](/blue-lakes.png)
 
+-->
