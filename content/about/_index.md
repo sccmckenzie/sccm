@@ -8,8 +8,8 @@ Welcome to my website! This is where I showcase ideas that have inspired me on m
 
 I originally earned my B.S. in Mechanical Engineering from Texas A&M University. Several years later, I discovered the wonderful open-source world of&nbsp;R. Together, my industry persective and passion for data science have charted an exciting path - one that I hope to chronicle here.
 
-[Twitter]('https://www.twitter.com/sccmckenzie') | [Github]('https://www.github.com/sccmckenzie') | [LinkedIn]('https://www.linkedin.com/in/scott-mckenzie-9b877294/') |
-[email]('sccmckenzie@gmail.com')
+[Twitter](https://www.twitter.com/sccmckenzie) | [Github](https://www.github.com/sccmckenzie) | [LinkedIn](https://www.linkedin.com/in/scott-mckenzie-9b877294/) |
+[email](sccmckenzie@gmail.com)
 
 ***
 
@@ -25,4 +25,4 @@ This entails:
 
 ***
 
-In my spare time, I enjoy planning long road-trips to the mountains. I am also an avid cellist in the [Austin Civic Orchestra]('http://austincivicorchestra.org/')!
+In my spare time, I enjoy planning long road-trips to the mountains. I am also an avid cellist in the [Austin Civic Orchestra](http://austincivicorchestra.org/)!
