@@ -25,4 +25,16 @@ This entails:
 
 ***
 
-In my spare time, I enjoy planning long road-trips to the mountains. I am also an avid cellist in the [Austin Civic Orchestra](http://austincivicorchestra.org/)!
+<table style = "font-size: 16px; margin: 0">
+<tr>
+<td style = "position: relative; vertical-align: middle; background: #fff; border-top: none">
+In my spare time, I enjoy planning long road-trips to the mountains. I am also an avid cellist in the <a href="http://austincivicorchestra.org/">Austin Civic Orchestra</a>.
+</td>
+<td style = "width: 350px; background: #fff; border-top: none">
+<img src = "/cello.png">
+</td>
+</tr>
+</table>
+
+![](/blue-lakes.png)
+
