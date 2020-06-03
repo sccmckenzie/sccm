@@ -3,7 +3,7 @@ Rproj.user
 .RData
 .Ruserdata
 sccm.Rproj
-public/*
-blogdown/*
-resources/*
-.Rproj.user
+public/
+blogdown/
+resources/
+.Rproj.user/
