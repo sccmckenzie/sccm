@@ -1,5 +1,5 @@
 # Site settings
-baseurl = "your_site_url_address"
+baseurl = "https://sad-jang-461f6f.netlify.app/"
 languageCode = "en"
 title = "Scott McKenzie"
 theme = "hugo-theme-cactus-plus"
