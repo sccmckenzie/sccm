@@ -1,0 +1,294 @@
+---
+title: Creating a Spherical Network Visualization
+description: Using cosine string distance to simplify cocktail dataset, creating a cleaner network visualization
+author: Scott McKenzie
+date: '2020-06-03'
+slug: cocktails-network
+categories: []
+tags: 
+- Network
+- String Distance
+editor_options: 
+  chunk_output_type: console
+---
+
+# Background
+
+In this post I will create a spherical network graph from the [`cocktails`](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-05-26/readme.md) dataset, which comes from TidyTuesday[^1]. You can see my deployed Shiny app here.
+```{r message = FALSE}
+library(tidyverse)
+
+# Getting data from TidyTuesday repo
+cocktails <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-26/cocktails.csv') %>% 
+  select(drink, ingredient_number, ingredient, measure) 
+```
+
+```{r message=FALSE, include = FALSE}
+# some examples...
+set.seed(16)
+drink_sample <- cocktails %>% 
+  distinct(drink) %>% 
+  sample_n(3)
+```
+
+`cocktails` contains `r nrow(distinct(cocktails, drink))` unique drinks. I never considered myself a proper connoisseur by any means, but this dataset serves as a humbling realization that I've barely scratched the surface of mixology: `r paste0(drink_sample$drink, collapse = ", ")`, to name a few. 
+
+The data is structured as shown below. Each ingredient + associated measure is stored in a unique row.
+```{r echo = FALSE}
+library(reactable)
+
+cocktails %>% 
+  # filtered to dirty martini for succinct example
+  filter(drink == "Dirty Martini") %>% 
+  reactable(columns = list(
+    drink = colDef(width = 125),
+    ingredient_number = colDef(width = 175)
+  ))
+```
+
+The plot below only shows the most frequently used ingredients in `cocktails`. Without any data cleaning, there are actually $`r nrow(distinct(cocktails, ingredient))`$ distinct ingredients.
+
+Vodka & gin take gold & silver, but I was surprised to see that whiskey doesn't even make the top 8! Otherwise, the below charts seems to make sense.
+
+<br><br>
+```{r echo=FALSE}
+cocktails %>% 
+  count(ingredient) %>% 
+  mutate(n = n / n()) %>% 
+  slice_max(n, n = 8) %>% # new dplyr 1.0.0 function :)
+  mutate(ingredient = fct_reorder(ingredient, n)) %>% 
+  ggplot(aes(n, ingredient)) +
+  geom_col(fill = "#a5c261") +
+  theme_minimal() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major.y = element_blank(),
+        plot.title.position = "plot",
+        text = element_text(size = 15)) +
+  scale_x_continuous(expand = expansion(0),
+                     labels = scales::percent_format(1),
+                     position = "top") +
+  labs(y = "",
+       x = "",
+       title = "Top Cocktail Ingredients",
+       subtitle = "% Occurrence")
+```
+
+With just these ingredients, the only drink you'd be able to make to order is a Screwdriver (Vodka + Orange Juice). If you're trying impress company, this list is not comprehensive enough - your first guest who orders an Old-Fashioned will be disappointed.
+
+In order to expand our capability for a wider variety of drinks, we need an effective way to visualize the most common *combinations* of ingredients. Relying on simple bar plots would quickly become impractical. 
+
+I've seen a few examples from other contributors involving network plots[^2] - a great way to visualize the interconnectedness between the `r nrow(distinct(cocktails, drink))` drinks.
+
+# The first roadblock
+
+Skimming through the distinct ingredients, we can observe duplicates due to small differences in capitalization and superfluous adjectives. This could unnecessarily convolute our network plot.
+
+After all, how many different types of lime juice do we need?
+
+```{r}
+cocktails %>% 
+  distinct(ingredient) %>% 
+  filter(str_detect(ingredient, "(L|l)ime"))
+```
+
+The first thing we can do is force everything to lowercase and remove punctuation.
+
+```{r message = FALSE}
+cocktails <- cocktails %>% 
+   mutate(ingredient = str_to_lower(ingredient),
+         ingredient = str_remove(ingredient, "'"))
+```
+
+Although this is a good start, some manual adjustments will be required. Comparing distinct ingredients one-by-one would be excessively laborious: $`r nrow(distinct(cocktails, ingredient))` ^ 2 /2$ combinations to be exact.
+
+Hence, a perfect opportunity to use string distance comparisons. I highly recommend M van der Loo's paper[^3] which provides a thorough introduction to the [stringdist](https://github.com/markvanderloo/stringdist) package. We will use the [fuzzyjoin](http://varianceexplained.org/fuzzyjoin/) package which harnesses the stringdist tools in a user-friendly interface; but we need to be careful to use a targeted approach.
+
+For example, `lime peel` and `lime juice` both contain `lime` and by many string distance metrics, will be fairly similar. But we certainly don't want to merge `lime juice` and `lime peel` into a single ingredient.
+
+We can perform more meaningful comparisons by first separating the ingredients into categories. This is an excellent opportunity to use the [tokenizers](https://docs.ropensci.org/tokenizers/) package + new [dplyr 1.0.0](https://dplyr.tidyverse.org/) functions!
+
+I'm a huge fan of `with_groups()` since it combines grouping + action + ungroup into one operation, making code chunks more concise.
+
+```{r}
+library(tokenizers)
+with_categories <- cocktails %>% 
+  distinct(ingredient) %>% 
+  with_groups(ingredient,
+              summarise,
+              category = tokenize_regex(ingredient,
+                                        # essentially word tokenization
+                                        pattern = " ",
+                                        simplify = TRUE)) %>% 
+  add_count(category, name = "freq") %>% 
+  # within each ingredient, what are the most common words?
+  with_groups(ingredient, slice_max, 1, order_by = freq) %>%
+  with_groups(ingredient, filter, n() == 1) %>% 
+  filter(freq > 6)
+```
+
+This results in the below categories.[^4]
+
+```{r echo=FALSE}
+with_categories %>% 
+  count(category, sort = TRUE) %>% 
+  reactable(fullWidth = FALSE)
+```
+
+We can now apply string distance matching within each category. Consider the juice category as an example. We have the following juices:
+
+```{r echo=FALSE}
+with_categories %>% 
+  filter(category == "juice") %>% 
+  .$ingredient
+```
+
+We want to evaluate the string distance between each one of these elements. Since these are all juices, we can omit "juice" - this would skew our string distance measure. While we're at it, we will also omit all white-space.
+
+```{r echo=FALSE}
+juices <- with_categories %>% 
+  filter(category == "juice") %>% 
+  mutate(reduced = str_remove(ingredient, category) %>% 
+              str_remove_all(" ")) %>% 
+  .$reduced
+
+juices
+```
+
+I opted to use q-gram cosine as distance metric, with $q = 1$. I experimented with edit-based methods, but q-gram seemed to perform best on this dataset.
+
+Suppose we are comparing `freshlime` and `lime`. With q-gram cosine, we first construct a set of all possible unique q-length strings (in this case, $length = 1$) between the two elements. This yields the following set:
+$$set: [f, r, e, s, h, l, i, m]$$
+Easy enough. Now, we assign a vector to each element that corresponds to the above set.
+$$v(freshlime) = [1, 1, 2, 1, 1, 1, 1, 1]\\v(lime) = [0,0,1,0,0,1,1,1]$$
+Now, we simply take the dot product of the two vectors and subtract from one.
+$$1 - \frac{2 + 1 + 1 + 1}{\sqrt{11}\sqrt{4}} = 0.246$$
+A value of $0$ indicates an exact match (vectors are identical), whereas a value of $1$ indicates no q-gram commonality (perpendicular vectors).
+
+A q-gram cosine matrix for a few juices is shown below. `freshlime` and `lime` share the lowest value in this set - which is what we intended.
+
+```{r echo=FALSE}
+clr <- function(x) rgb(colorRamp(c("#79D7F7", "#F5F5F5"))(x), maxColorValue = 255)
+
+mat <- stringdist::stringdistmatrix(juices[c(2, 4, 8, 10, 15)], juices[c(2, 4, 8, 10, 15)], method = "cosine", q = 1, useNames = "strings")
+
+mat %>% 
+  reactable(
+    compact = TRUE,
+    defaultColDef = colDef(
+      style = function(value) {
+        normalized <- (value - min(mat)) / (max(mat) - min(mat))
+        color <- clr(normalized)
+        if (value == 0) return(list(background = "white")) else return(list(background = color))
+      },
+      cell = function(value) {
+        if (!is.numeric(value)) return(value)
+        if (value == 0) return("x") else return(round(value, 2))
+      }
+    ),
+    columns = list(
+    .rownames = colDef(style = "font-weight: bold;")
+  ))
+```
+
+<br>
+I set the lower string distance threshold to $0.3$ - anything below this value will be held out for review.
+
+```{r message=FALSE}
+library(fuzzyjoin)
+ingredients_similar <- with_categories %>% 
+  transmute(category,
+            ingredient,
+            # e.g. "fresh lime juice" -> "freshlime"
+            reduced = str_remove(ingredient, category) %>% 
+              str_remove_all(" ")) %>% 
+  # remove ingredients that are synonymous with category
+  filter(reduced != "") %>% 
+  group_nest(category) %>%
+  rowwise() %>% 
+  summarise(category = category,
+            stringdist_left_join(data,
+                                 data, 
+                                 by = "reduced",
+                                 method = "cosine",
+                                 q = 1,
+                                 distance_col = "dist") %>%
+              filter(dist < 0.3,
+                     #identical strings have distance of 0
+                     ingredient.x != ingredient.y) %>%
+              # trick to remove mirrored rows
+              distinct(dist, .keep_all = TRUE)) %>% 
+  arrange(dist)
+```
+
+The resulting table is below! Although there are quite a few false positives, we've effectively reduced a list of $`r nrow(distinct(cocktails, ingredient))` ^ 2 /2$ combinations to $`r nrow(ingredients_similar)`$ rows for our review.
+
+(I've highlighted the rows I've chosen to merge)
+```{r echo=FALSE}
+highlight <- function(value, cellInfo) {
+  if(cellInfo %in% c(3, 6, 8, 9, 10, 11, 13)) return(list(background = "#FFC97F"))
+}
+
+ingredients_similar %>% 
+  select(!contains("reduced")) %>% 
+  arrange(dist) %>% 
+  reactable(
+    columns = list(
+      dist = colDef(
+        style = function(value) {
+          normalized <- (value - min(ingredients_similar$dist)) / (max(ingredients_similar$dist) - min(ingredients_similar$dist))
+          color <- clr(normalized)
+          if (value == 0) return(list(background = "white")) else return(list(background = color))
+        },
+        format = colFormat(digits = 2)
+      ),
+      category = colDef(
+        width = 70,
+        style = function(value, cellInfo) {
+          highlight(value, cellInfo)
+        }
+      ),
+      ingredient.x = colDef(
+        width = 250,
+        style = function(value, cellInfo) {
+          highlight(value, cellInfo)
+        }
+      ),
+      ingredient.y = colDef(
+        width = 200,
+        style = function(value, cellInfo) {
+          highlight(value, cellInfo)
+        }
+      )
+    )
+  )
+```
+
+$7$ less ingredients may not be as much improvement as we'd originally hoped, but we at least have peace of mind from thoroughly canvassing for redundant ingredients.[^5]
+
+```{r}
+ingredients_replace <- ingredients_similar %>% 
+  slice(c(3, 6, 8, 9, 10, 11, 13)) %>% 
+  select(contains("ingredient")) %>% 
+  rowwise() %>% 
+  mutate(ingredient = list(c(ingredient.x, ingredient.y))) %>% 
+  transmute(old_ingredient = ingredient[which.max(str_length(ingredient))],
+            new_ingredient = ingredient[which.min(str_length(ingredient))])
+
+cocktails <- cocktails %>% 
+  left_join(with_categories) %>% 
+  left_join(ingredients_replace, by = c("ingredient" = "old_ingredient")) %>% 
+    mutate(category = coalesce(category, "other"),
+           ingredient = if_else(is.na(new_ingredient), ingredient, new_ingredient)) %>% 
+  select(-new_ingredient)
+```
+
+[^1]: [`TidyTuesday`](https://github.com/rfordatascience/tidytuesday) is a weekly project hosted by the `R4DS Online Learning Community` that encourages beginner & seasoned data scientists to apply their skills on a variety of datasets.
+
+[^2]: [https://twitter.com/CedScherer/status/1266434219527585799](https://twitter.com/CedScherer/status/1266434219527585799)<br>[https://twitter.com/jakekaupp/status/1266332219565576192](https://twitter.com/jakekaupp/status/1266332219565576192)<br>[https://twitter.com/AndreaNOdell/status/1266198470798401536](https://twitter.com/AndreaNOdell/status/1266198470798401536)
+
+[^3]: van der Loo M (2014). “The stringdist package for approximate string matching.” _The R Journal_,
+*6*, 111-122. <URL: https://CRAN.R-project.org/package=stringdist>.
+
+[^4]: Assumption made that an ingredient that does not contain keyword with global frequency greater than 6 is unique enough not to warrant further consideration.
+
+[^5]: If I had more time, I would like to run the string distance comparison on all uncategorized ingredients.

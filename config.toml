@@ -9,6 +9,7 @@ hasCJKLanguage = false
 
 # Added to theme
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+enableEmoji = true
 
 [permalinks]
     post = "/:slug/"
@@ -29,7 +30,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 	enableSummary = true
 	# Set the value to true if use description in post front matter replace content summary
-	useDescriptionReplaceSummary = false
+	useDescriptionReplaceSummary = true
 
 
 	enableGoogleAnalytics = false
