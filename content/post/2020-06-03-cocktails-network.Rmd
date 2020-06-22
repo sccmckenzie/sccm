@@ -1,9 +1,9 @@
 ---
-title: Creating a Spherical Network Visualization
-description: Using cosine string distance to simplify cocktail dataset, creating a cleaner network visualization
+title: "Cocktail Ingredients Network: Part 1"
+description: "Leveraging cosine string distance to simplify cocktails dataset"
 author: Scott McKenzie
 date: '2020-06-03'
-slug: cocktails-network
+slug: "cocktails-network-1"
 categories: []
 tags: 
 - Network
@@ -12,9 +12,17 @@ editor_options:
   chunk_output_type: console
 ---
 
+You suddenly discover that you are hosting a party tonight. The guests are expecting you to prepare cocktails. With limited time to prepare, you can only make one trip to the store. What ingredients should you buy in order to maximize your mixological palette? Assume your shopping cart holds `n` items.
+
+In Part 1, we will introduce the `cocktails` dataset, which forms the inspiration for this problem. Although data cleaning for `cocktails` is mostly done, some touch-ups are needed. We will apply cosine string distance comparisons to eliminate redundant ingredients.
+
+Part 2 focuses on the approach used to optimize ingredient selection.
+
+Click <a href = "https://sccm.shinyapps.io/spherical-network/" target = "_blank">here</a> to see the Shiny app that illustrates the final results!
+
 # Background
 
-In this post I will create a spherical network graph from the [`cocktails`](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-05-26/readme.md) dataset, which comes from TidyTuesday[^1]. You can see my deployed Shiny app here.
+The [`cocktails`](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-05-26/readme.md) dataset comes from TidyTuesday[^1].
 ```{r message = FALSE}
 library(tidyverse)
 
@@ -29,6 +37,8 @@ set.seed(16)
 drink_sample <- cocktails %>% 
   distinct(drink) %>% 
   sample_n(3)
+
+n_original <- n_distinct(cocktails$ingredient)
 ```
 
 `cocktails` contains `r nrow(distinct(cocktails, drink))` unique drinks. I never considered myself a proper connoisseur by any means, but this dataset serves as a humbling realization that I've barely scratched the surface of mixology: `r paste0(drink_sample$drink, collapse = ", ")`, to name a few. 
@@ -46,7 +56,7 @@ cocktails %>%
   ))
 ```
 
-The plot below only shows the most frequently used ingredients in `cocktails`. Without any data cleaning, there are actually $`r nrow(distinct(cocktails, ingredient))`$ distinct ingredients.
+The plot below shows the most frequently used ingredients in `cocktails`. At first glance, there are $`r nrow(distinct(cocktails, ingredient))`$ distinct ingredients.
 
 Vodka & gin take gold & silver, but I was surprised to see that whiskey doesn't even make the top 8! Otherwise, the below charts seems to make sense.
 
@@ -54,7 +64,7 @@ Vodka & gin take gold & silver, but I was surprised to see that whiskey doesn't 
 ```{r echo=FALSE}
 cocktails %>% 
   count(ingredient) %>% 
-  mutate(n = n / n()) %>% 
+  mutate(n = n / n_distinct(cocktails$drink)) %>% 
   slice_max(n, n = 8) %>% # new dplyr 1.0.0 function :)
   mutate(ingredient = fct_reorder(ingredient, n)) %>% 
   ggplot(aes(n, ingredient)) +
@@ -75,13 +85,15 @@ cocktails %>%
 
 With just these ingredients, the only drink you'd be able to make to order is a Screwdriver (Vodka + Orange Juice). If you're trying impress company, this list is not comprehensive enough - your first guest who orders an Old-Fashioned will be disappointed.
 
-In order to expand our capability for a wider variety of drinks, we need an effective way to visualize the most common *combinations* of ingredients. Relying on simple bar plots would quickly become impractical. 
+Is the solution to simply buy *more* ingredients? We are assuming that going down the ingredient count list is the smartest method to solve this problem. Spoiler alert: it's not (more in part 2).
 
-I've seen a few examples from other contributors involving network plots[^2] - a great way to visualize the interconnectedness between the `r nrow(distinct(cocktails, drink))` drinks.
+<!-- In order to expand our capability for a wider variety of drinks, we need an effective way to visualize the most common combinations of ingredients. Relying on simple bar plots would quickly become impractical. -->
 
-# The first roadblock
+<!-- I've seen a few examples from other contributors involving network plots[^2] - a great way to visualize the interconnectedness between the `r nrow(distinct(cocktails, drink))` drinks. -->
 
-Skimming through the distinct ingredients, we can observe duplicates due to small differences in capitalization and superfluous adjectives. This could unnecessarily convolute our network plot.
+# The First Roadblock
+
+Skimming through the distinct ingredients, we can observe duplicates due to small differences in capitalization and superfluous adjectives. This could add unwanted redundancy to our selection method and unnecessarily convolute our network plot.
 
 After all, how many different types of lime juice do we need?
 
@@ -99,7 +111,7 @@ cocktails <- cocktails %>%
          ingredient = str_remove(ingredient, "'"))
 ```
 
-Although this is a good start, some manual adjustments will be required. Comparing distinct ingredients one-by-one would be excessively laborious: $`r nrow(distinct(cocktails, ingredient))` ^ 2 /2$ combinations to be exact.
+Although this is a good start, we really need a systematic way to detect similar ingredients. Making $`r n_original` ^ 2 /2 = `r n_original ^ 2 /2`$ manual comparisons is unrealistic.
 
 Hence, a perfect opportunity to use string distance comparisons. I highly recommend M van der Loo's paper[^3] which provides a thorough introduction to the [stringdist](https://github.com/markvanderloo/stringdist) package. We will use the [fuzzyjoin](http://varianceexplained.org/fuzzyjoin/) package which harnesses the stringdist tools in a user-friendly interface; but we need to be careful to use a targeted approach.
 
@@ -133,7 +145,7 @@ with_categories %>%
   count(category, sort = TRUE) %>% 
   reactable(fullWidth = FALSE)
 ```
-
+<br>
 We can now apply string distance matching within each category. Consider the juice category as an example. We have the following juices:
 
 ```{r echo=FALSE}
@@ -142,7 +154,7 @@ with_categories %>%
   .$ingredient
 ```
 
-We want to evaluate the string distance between each one of these elements. Since these are all juices, we can omit "juice" - this would skew our string distance measure. While we're at it, we will also omit all white-space.
+We want to evaluate the string distance between each one of these elements. Since these are all juices, we can omit "juice". Let's also omit white-space.
 
 ```{r echo=FALSE}
 juices <- with_categories %>% 
@@ -151,12 +163,21 @@ juices <- with_categories %>%
               str_remove_all(" ")) %>% 
   .$reduced
 
-juices
+with_categories %>% 
+  filter(category == "juice") %>% 
+  transmute(before = ingredient,
+            after = juices) %>% 
+  sample_n(5) %>% 
+  reactable(fullWidth = FALSE,
+            defaultColDef = colDef(width = 150),
+            columns = list(
+              after = colDef(style = list(background = "#2F8475", color = "white"))
+            ))
 ```
-
+<br>
 I opted to use q-gram cosine as distance metric, with $q = 1$. I experimented with edit-based methods, but q-gram seemed to perform best on this dataset.
 
-Suppose we are comparing `freshlime` and `lime`. With q-gram cosine, we first construct a set of all possible unique q-length strings (in this case, $length = 1$) between the two elements. This yields the following set:
+Suppose we are comparing `freshlime` and `lime`. With q-gram cosine, we first construct a set of all possible unique q-length strings (in this case, $length = 1$) between the two elements, yielding the following set:
 $$set: [f, r, e, s, h, l, i, m]$$
 Easy enough. Now, we assign a vector to each element that corresponds to the above set.
 $$v(freshlime) = [1, 1, 2, 1, 1, 1, 1, 1]\\v(lime) = [0,0,1,0,0,1,1,1]$$
@@ -193,7 +214,7 @@ mat %>%
 <br>
 I set the lower string distance threshold to $0.3$ - anything below this value will be held out for review.
 
-```{r message=FALSE}
+```{r message=FALSE, include = FALSE}
 library(fuzzyjoin)
 ingredients_similar <- with_categories %>% 
   transmute(category,
@@ -220,6 +241,7 @@ ingredients_similar <- with_categories %>%
   arrange(dist)
 ```
 
+
 The resulting table is below! Although there are quite a few false positives, we've effectively reduced a list of $`r nrow(distinct(cocktails, ingredient))` ^ 2 /2$ combinations to $`r nrow(ingredients_similar)`$ rows for our review.
 
 (I've highlighted the rows I've chosen to merge)
@@ -242,13 +264,13 @@ ingredients_similar %>%
         format = colFormat(digits = 2)
       ),
       category = colDef(
-        width = 70,
+        width = 90,
         style = function(value, cellInfo) {
           highlight(value, cellInfo)
         }
       ),
       ingredient.x = colDef(
-        width = 250,
+        width = 240,
         style = function(value, cellInfo) {
           highlight(value, cellInfo)
         }
@@ -263,9 +285,9 @@ ingredients_similar %>%
   )
 ```
 
-$7$ less ingredients may not be as much improvement as we'd originally hoped, but we at least have peace of mind from thoroughly canvassing for redundant ingredients.[^5]
 
-```{r}
+
+```{r include = FALSE}
 ingredients_replace <- ingredients_similar %>% 
   slice(c(3, 6, 8, 9, 10, 11, 13)) %>% 
   select(contains("ingredient")) %>% 
@@ -282,6 +304,37 @@ cocktails <- cocktails %>%
   select(-new_ingredient)
 ```
 
+# Conclusion
+
+Altogether, the various procedures above have reduced the distinct ingredients from $`r n_original`$ to $`r n_distinct(cocktails$ingredient)`$. Click [here](https://github.com/sccmckenzie/spherical-network/blob/master/data.R) to see data transformation code from start to finish.[^5]
+
+In Part 2, we will return to the original problem:
+
+What ingredients should you buy in order to maximize your mixological palette?
+
+
+
+<!-- # Creating a Network Graph -->
+
+<!-- With $`r n_distinct(cocktails$ingredient)`$ distinct ingredients remaining in `cocktails`, creating a thoughtfully arranged network graph will be challenging. -->
+
+<!-- Many people had already generated excellent 2-dimensional network graphs for `cocktails`. For the sake of originality, I felt compelled to create something 3-dimensional. -->
+
+<!-- Without any forethought, arranging the ingredients into a sphere results in the below graph. -->
+
+<!-- ```{r echo = FALSE} -->
+<!-- cocktails -->
+<!-- ``` -->
+
+<!-- Yikes, that's not pretty. We need to think of some ways to make this more intelligible. Specifically: -->
+
+<!-- 1. Scaffold ingredients (nodes) by intercorrelation to create a multi-tiered sphere. -->
+<!-- 2. Color ingredients (nodes) by category (juice, liqueur, syrup, etc.) -->
+<!-- 3. Only show edges for individual drinks selected by user -->
+
+
+
+
 [^1]: [`TidyTuesday`](https://github.com/rfordatascience/tidytuesday) is a weekly project hosted by the `R4DS Online Learning Community` that encourages beginner & seasoned data scientists to apply their skills on a variety of datasets.
 
 [^2]: [https://twitter.com/CedScherer/status/1266434219527585799](https://twitter.com/CedScherer/status/1266434219527585799)<br>[https://twitter.com/jakekaupp/status/1266332219565576192](https://twitter.com/jakekaupp/status/1266332219565576192)<br>[https://twitter.com/AndreaNOdell/status/1266198470798401536](https://twitter.com/AndreaNOdell/status/1266198470798401536)
@@ -289,6 +342,6 @@ cocktails <- cocktails %>%
 [^3]: van der Loo M (2014). “The stringdist package for approximate string matching.” _The R Journal_,
 *6*, 111-122. <URL: https://CRAN.R-project.org/package=stringdist>.
 
-[^4]: Assumption made that an ingredient that does not contain keyword with global frequency greater than 6 is unique enough not to warrant further consideration.
+[^4]: Keywords that contain a global frequency of less than 6 remain unclassified.
 
 [^5]: If I had more time, I would like to run the string distance comparison on all uncategorized ingredients.
