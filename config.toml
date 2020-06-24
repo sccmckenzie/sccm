@@ -1,5 +1,5 @@
 # Site settings
-baseurl = "https://sad-jang-461f6f.netlify.app/"
+baseurl = "https://sccm.io/"
 languageCode = "en"
 title = "sccm"
 theme = "hugo-theme-cactus-plus"
