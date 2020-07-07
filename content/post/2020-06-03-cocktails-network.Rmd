@@ -18,7 +18,7 @@ In Part 1, we will introduce the `cocktails` dataset, which forms the inspiratio
 
 Part 2 focuses on the approach used to optimize ingredient selection.
 
-Click <a href = "https://sccm.shinyapps.io/spherical-network/" target = "_blank">here</a> to see the Shiny app that illustrates the final results!
+Click <a href = "https://sccm.shinyapps.io/cocktail-ingredients/" target = "_blank">here</a> to see the Shiny app that illustrates the final results!
 
 # Background
 

@@ -1,0 +1,131 @@
+---
+title: 'Operational Efficiency: Some thoughts + Small Example'
+description: Featuring dplyr 1.0.0 + purrr::flatten_chr
+author: Scott McKenzie
+date: '2020-07-06'
+slug: dplyr-efficient-operation
+categories: []
+tags:
+  - Data Transformation
+  - dplyr
+---
+
+```{r include = FALSE}
+library(tidyverse)
+
+options(dplyr.summarise.inform = FALSE)
+
+coffee_ratings <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-07-07/coffee_ratings.csv')
+
+set.seed(17)
+df <- coffee_ratings %>% 
+  filter(!farm_name %in% c("several", "various", "-")) %>% 
+  distinct(species, farm_name, company) %>% 
+  drop_na() %>%  
+  group_by(species, farm_name) %>% 
+  summarise(companies = list(company),
+            n = n()) %>% 
+  filter(n > 1) %>% 
+  select(-n) %>% 
+  slice_head(n = 8) %>% 
+  ungroup()
+```
+
+
+*Operational efficiency*. Or, in other words: packing code into as few operations as possible.
+
+I often follow this philosophy to a fault; for me, discovering new tools & methods to achieve the same result is one of the most rewarding aspects of programming. In that sense, "data science" is a playground.
+
+Recently, I encountered a situation involving nested columns within a grouped data frame. Consider the below excerpt from the [`coffee_ratings`](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-07-07/readme.md) dataset.
+
+```{r}
+df
+```
+
+Each element within the `companies` column contains multiple character elements. In one operation, how can we obtain a data frame that contains a unique count of companies + farms for both *Arabica* & *Robusta*.
+
+For the `farm_name` column, this is trivial with conventional `dplyr` syntax:
+```{r}
+df %>% 
+  group_by(species) %>% 
+  summarise(n_farms = n_distinct(farm_name))
+```
+
+However, if we try to extend this approach to the `farm_name` column, we get the following:
+```{r}
+df %>% 
+  group_by(species) %>% 
+  summarise(n_companies = n_distinct(companies)) ## this is misleading!
+```
+What's wrong? The `summarise` operation return an integer column like we expected. In fact, `n_distinct` counted the number of distinct *permutations* of list elements in the `companies` columns
+```{r}
+company_list <- df %>% 
+  filter(species == "Arabica") %>% 
+  pull(companies)
+
+company_list # expanded form of 'companies' column
+```
+
+This is not exactly what we want. We want the number of unique companies between the permutations.
+
+Cue `purrr::flatten_chr`, which simplifies the hierarchical structure of its argument.[^1]
+```{r}
+purrr::flatten_chr(company_list)
+```
+
+So much nicer! Now we can apply `n_distinct` to this result.
+
+
+## Method A
+```{r}
+df %>% 
+  group_by(species) %>% 
+  summarise(n_farms = n_distinct(farm_name),
+            n_companies = n_distinct(flatten_chr(companies))) ## achieves desired result
+```
+
+For extra credit, we can use `with_groups` to accomplish everything in one operation.
+
+## Method B
+```{r}
+df %>% 
+  with_groups(species,
+              summarise,
+              tibble(
+                n_farms = n_distinct(farm_name),
+                n_companies = n_distinct(flatten_chr(companies))
+              )
+  )
+```
+But is Method B really better? Sure, it's one operation - and if the primary consideration is operational efficiency than I daresay this is an excellent solution.
+
+This observation urges us to revisit our definition of operational efficiency: from a memory perspective, is there any computational difference between Method A & B? 
+
+```{r echo = FALSE}
+library(bench)
+results <- bench::mark(
+  A = df %>% 
+    group_by(species) %>% 
+    summarise(n_farms = n_distinct(farm_name),
+              n_companies = n_distinct(flatten_chr(companies))),
+  B = df %>% 
+    with_groups(species,
+                summarise,
+                tibble(
+                  n_farms = n_distinct(farm_name),
+                  n_companies = n_distinct(flatten_chr(companies))
+                )
+    )
+)
+
+results %>% select(expression:mem_alloc)
+```
+Actually, method B is worse than method A.
+
+# Conclusion
+
+Constantly being self-critical of one's code is a dangerous trap, but I also believe this is what gives us the excitement to try new things. Ultimately, I believe the most "efficient" code takes intelligibility & computational performance into consideration while striving to be as concise as possible.
+
+I am constantly reminding myself how important is to be conscientious of these factors.
+
+[^1]: This is similar to `base::unlist`, but only removes one layer of hierarchy at a time.
