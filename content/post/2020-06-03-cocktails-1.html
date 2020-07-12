@@ -1,12 +1,11 @@
 ---
-title: "Cocktail Ingredients Network: Part 1"
+title: "Cocktail Ingredients: Part 1"
 description: "Leveraging cosine string distance to simplify cocktails dataset"
 author: Scott McKenzie
 date: '2020-06-03'
-slug: "cocktails-network-1"
+slug: "cocktails-1"
 categories: []
 tags: 
-- Network
 - String Distance
 editor_options: 
   chunk_output_type: console
@@ -39,7 +38,7 @@ cocktails &lt;- read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/
 <p>The plot below shows the most frequently used ingredients in <code>cocktails</code>. At first glance, there are <span class="math inline">\(333\)</span> distinct ingredients.</p>
 <p>Vodka &amp; gin take gold &amp; silver, but I was surprised to see that whiskey doesn’t even make the top 8! Otherwise, the below charts seems to make sense.</p>
 <p><br><br>
-<img src="/post/2020-06-03-cocktails-network_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<img src="/post/2020-06-03-cocktails-1_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>With just these ingredients, the only drink you’d be able to make to order is a Screwdriver (Vodka + Orange Juice). If you’re trying impress company, this list is not comprehensive enough - your first guest who orders an Old-Fashioned will be disappointed.</p>
 <p>Is the solution to simply buy <em>more</em> ingredients? We are assuming that going down the ingredient count list is the smartest method to solve this problem. Spoiler alert: it’s not (more in part 2).</p>
 <!-- In order to expand our capability for a wider variety of drinks, we need an effective way to visualize the most common combinations of ingredients. Relying on simple bar plots would quickly become impractical. -->
@@ -121,20 +120,9 @@ I set the lower string distance threshold to <span class="math inline">\(0.3\)</
 </div>
 <div id="conclusion" class="section level1">
 <h1>Conclusion</h1>
-<p>Altogether, the various procedures above have reduced the distinct ingredients from <span class="math inline">\(333\)</span> to <span class="math inline">\(298\)</span>. Click <a href="https://github.com/sccmckenzie/spherical-network/blob/master/data.R">here</a> to see data transformation code from start to finish.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<p>Altogether, the various procedures above have reduced the distinct ingredients from <span class="math inline">\(333\)</span> to <span class="math inline">\(298\)</span>. Click <a href="https://github.com/sccmckenzie/cocktail-ingredients/blob/master/data-clean.R">here</a> to see data transformation code from start to finish.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
 <p>In Part 2, we will return to the original problem:</p>
 <p>What ingredients should you buy in order to maximize your mixological palette?</p>
-<!-- # Creating a Network Graph -->
-<!-- With $298$ distinct ingredients remaining in `cocktails`, creating a thoughtfully arranged network graph will be challenging. -->
-<!-- Many people had already generated excellent 2-dimensional network graphs for `cocktails`. For the sake of originality, I felt compelled to create something 3-dimensional. -->
-<!-- Without any forethought, arranging the ingredients into a sphere results in the below graph. -->
-<!-- ```{r echo = FALSE} -->
-<!-- cocktails -->
-<!-- ``` -->
-<!-- Yikes, that's not pretty. We need to think of some ways to make this more intelligible. Specifically: -->
-<!-- 1. Scaffold ingredients (nodes) by intercorrelation to create a multi-tiered sphere. -->
-<!-- 2. Color ingredients (nodes) by category (juice, liqueur, syrup, etc.) -->
-<!-- 3. Only show edges for individual drinks selected by user -->
 </div>
 <div class="footnotes">
 <hr />

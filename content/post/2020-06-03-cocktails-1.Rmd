@@ -1,12 +1,11 @@
 ---
-title: "Cocktail Ingredients Network: Part 1"
+title: "Cocktail Ingredients: Part 1"
 description: "Leveraging cosine string distance to simplify cocktails dataset"
 author: Scott McKenzie
 date: '2020-06-03'
-slug: "cocktails-network-1"
+slug: "cocktails-1"
 categories: []
 tags: 
-- Network
 - String Distance
 editor_options: 
   chunk_output_type: console
@@ -306,33 +305,11 @@ cocktails <- cocktails %>%
 
 # Conclusion
 
-Altogether, the various procedures above have reduced the distinct ingredients from $`r n_original`$ to $`r n_distinct(cocktails$ingredient)`$. Click [here](https://github.com/sccmckenzie/spherical-network/blob/master/data.R) to see data transformation code from start to finish.[^5]
+Altogether, the various procedures above have reduced the distinct ingredients from $`r n_original`$ to $`r n_distinct(cocktails$ingredient)`$. Click [here](https://github.com/sccmckenzie/cocktail-ingredients/blob/master/data-clean.R) to see data transformation code from start to finish.[^5]
 
 In Part 2, we will return to the original problem:
 
 What ingredients should you buy in order to maximize your mixological palette?
-
-
-
-<!-- # Creating a Network Graph -->
-
-<!-- With $`r n_distinct(cocktails$ingredient)`$ distinct ingredients remaining in `cocktails`, creating a thoughtfully arranged network graph will be challenging. -->
-
-<!-- Many people had already generated excellent 2-dimensional network graphs for `cocktails`. For the sake of originality, I felt compelled to create something 3-dimensional. -->
-
-<!-- Without any forethought, arranging the ingredients into a sphere results in the below graph. -->
-
-<!-- ```{r echo = FALSE} -->
-<!-- cocktails -->
-<!-- ``` -->
-
-<!-- Yikes, that's not pretty. We need to think of some ways to make this more intelligible. Specifically: -->
-
-<!-- 1. Scaffold ingredients (nodes) by intercorrelation to create a multi-tiered sphere. -->
-<!-- 2. Color ingredients (nodes) by category (juice, liqueur, syrup, etc.) -->
-<!-- 3. Only show edges for individual drinks selected by user -->
-
-
 
 
 [^1]: [`TidyTuesday`](https://github.com/rfordatascience/tidytuesday) is a weekly project hosted by the `R4DS Online Learning Community` that encourages beginner & seasoned data scientists to apply their skills on a variety of datasets.

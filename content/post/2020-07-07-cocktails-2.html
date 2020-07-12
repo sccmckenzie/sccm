@@ -1,0 +1,331 @@
+---
+title: 'Cocktail Ingredients: Part 2'
+description: 'Implementing algorithm to optimize ingredient selection order'
+author: Scott McKenzie
+date: '2020-07-07'
+slug: "cocktails-2"
+categories: []
+tags:
+  - Algorithm
+  - Selection Optimization
+  - Bootstrap
+---
+
+<script src="/rmarkdown-libs/core-js/shim.min.js"></script>
+<script src="/rmarkdown-libs/react/react.min.js"></script>
+<script src="/rmarkdown-libs/react/react-dom.min.js"></script>
+<script src="/rmarkdown-libs/reactwidget/react-tools.js"></script>
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/reactable-binding/reactable.js"></script>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>In <a href="/cocktails-1/">Part 1</a>, we used the <code>stringdist</code> &amp; <code>fuzzyjoin</code> packages to clean the <code>cocktails</code> dataset.</p>
+<p>With a tidied dataset, we return to the original problem statement:</p>
+<div id="problem-statement">
+<h4 id="what-ingredients-should-you-buy-in-order-to-maximize-your-mixological-palette-assume-your-shopping-cart-holds-n-items.">What ingredients should you buy in order to maximize your mixological palette? Assume your shopping cart holds <span class="math inline">\(n\)</span> items.</h4>
+</div>
+<p>Assumptions:</p>
+<ol style="list-style-type: decimal">
+<li><p>We interpret “maximize mixological palette” to strictly mean <em>achieve as much variety as possible</em>. In other words, we won’t assign weight to the drink based on its popularity.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> For this problem, we are trying to maximize the quantity of <em>substantiated</em> recipes.</p></li>
+<li><p>For the scope of this post, let’s suppose we are interested in whiskey-based cocktails.</p></li>
+</ol>
+<pre class="r"><code>whiskey &lt;- cocktails %&gt;% 
+  with_groups(drink, 
+              filter, 
+              any(str_detect(ingredient, &quot;(bourbon|whiskey)&quot;)))
+
+unique(whiskey$drink)</code></pre>
+<pre><code>##  [1] &quot;Algonquin&quot;                     &quot;Allegheny&quot;                    
+##  [3] &quot;Artillery Punch&quot;               &quot;Boston Sour&quot;                  
+##  [5] &quot;Bourbon Sling&quot;                 &quot;Bourbon Sour&quot;                 
+##  [7] &quot;Brandon and Will&#39;s Coke Float&quot; &quot;California Lemonade&quot;          
+##  [9] &quot;Classic Old-Fashioned&quot;         &quot;Damned if you do&quot;             
+## [11] &quot;Egg Nog #4&quot;                    &quot;Frisco Sour&quot;                  
+## [13] &quot;Hot Creamy Bush&quot;               &quot;Imperial Fizz&quot;                
+## [15] &quot;Irish Coffee&quot;                  &quot;Irish Curdling Cow&quot;           
+## [17] &quot;Irish Spring&quot;                  &quot;Jack&#39;s Vanilla Coke&quot;          
+## [19] &quot;Japanese Fizz&quot;                 &quot;John Collins&quot;                 
+## [21] &quot;Kentucky B And B&quot;              &quot;Kentucky Colonel&quot;             
+## [23] &quot;Manhattan&quot;                     &quot;Midnight Cowboy&quot;              
+## [25] &quot;Mississippi Planters Punch&quot;    &quot;New York Sour&quot;                
+## [27] &quot;Old Fashioned&quot;                 &quot;Owen&#39;s Grandmother&#39;s Revenge&quot; 
+## [29] &quot;Sazerac&quot;                       &quot;Whiskey Sour&quot;</code></pre>
+<p>Between these drinks, there are 56 ingredients.</p>
+<pre><code>##  [1] &quot;blended whiskey&quot;   &quot;dry vermouth&quot;      &quot;pineapple juice&quot;  
+##  [4] &quot;bourbon&quot;           &quot;blackberry brandy&quot; &quot;lemon juice&quot;      
+##  [7] &quot;lemon peel&quot;        &quot;tea&quot;               &quot;rye whiskey&quot;      
+## [10] &quot;red wine&quot;          &quot;rum&quot;               &quot;brandy&quot;           
+## [13] &quot;benedictine&quot;       &quot;orange juice&quot;      &quot;lemon&quot;            
+## [16] &quot;powdered sugar&quot;    &quot;egg white&quot;         &quot;cherry&quot;           
+## [19] &quot;sugar&quot;             &quot;water&quot;             &quot;orange&quot;           
+## [22] &quot;maraschino cherry&quot; &quot;vanilla ice-cream&quot; &quot;coca-cola&quot;        
+## [25] &quot;lime&quot;              &quot;grenadine&quot;         &quot;carbonated water&quot; 
+## [28] &quot;bitters&quot;           &quot;whiskey&quot;           &quot;hot damn&quot;         
+## [31] &quot;egg yolk&quot;          &quot;nutmeg&quot;            &quot;milk&quot;             
+## [34] &quot;light rum&quot;         &quot;vanilla extract&quot;   &quot;salt&quot;             
+## [37] &quot;whipped cream&quot;     &quot;irish whiskey&quot;     &quot;irish cream&quot;      
+## [40] &quot;coffee&quot;            &quot;vodka&quot;             &quot;peach brandy&quot;     
+## [43] &quot;sweet and sour&quot;    &quot;ice&quot;               &quot;tennessee whiskey&quot;
+## [46] &quot;port&quot;              &quot;club soda&quot;         &quot;sweet vermouth&quot;   
+## [49] &quot;angostura bitters&quot; &quot;orange peel&quot;       &quot;dark rum&quot;         
+## [52] &quot;heavy cream&quot;       &quot;beer&quot;              &quot;lemonade&quot;         
+## [55] &quot;ricard&quot;            &quot;peychaud bitters&quot;</code></pre>
+<p>It’s feasible that we could acquire all of these items before the dinner party - given ample time + assuming we could locate these items at one store. We simplify these contingencies into one parameter, <span class="math inline">\(n\)</span>, the number of items our shopping cart can hold.</p>
+<p>For the sake of discussion, let’s suppose <span class="math inline">\(n = 3\)</span>. Where do we start?</p>
+<p>Bourbon? Lemons? Sugar? These ingredients have a high occurrence rate in the <code>whiskey</code> dataset - therefore, we assume it would be a valuable use of shopping cart space to grab these ingredients.</p>
+<p style="text-align: center">
+<caption>
+<span id="tab:mytbl-1">Table 1: </span>Most common ingredients in <code>whiskey</code> dataset
+</caption>
+</p>
+<p><div style="width: 400px; margin-left: auto; margin-right: auto">
+<div id="htmlwidget-1" class="reactable html-widget" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"ingredient":["bourbon","lemon","sugar","blended whiskey","powdered sugar","lemon juice","benedictine","carbonated water","cherry","lemon peel","maraschino cherry","orange","water","egg white","ice","irish whiskey","light rum","lime","orange juice","angostura bitters","brandy","coca-cola","coffee","dry vermouth","irish cream","red wine","vanilla extract","whipped cream","whiskey","beer","bitters","blackberry brandy","club soda","dark rum","egg yolk","grenadine","heavy cream","hot damn","lemonade","milk","nutmeg","orange peel","peach brandy","peychaud bitters","pineapple juice","port","ricard","rum","rye whiskey","salt","sweet and sour","sweet vermouth","tea","tennessee whiskey","vanilla ice-cream","vodka"],"frequency":[15,12,10,8,6,5,4,4,4,4,4,4,4,3,3,3,3,3,3,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]},"columns":[{"accessor":"ingredient","name":"ingredient","type":"character","width":200},{"accessor":"frequency","name":"frequency","type":"numeric","width":200}],"defaultPageSize":10,"paginationType":"numbers","showPageInfo":true,"minRows":1,"compact":true,"inline":true,"dataKey":"211e64382d9ceb266dd20282ad7d973a"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+</div>
+<br></p>
+<p>Great! Now we can print out Table <a href="#tab:mytbl-1">1</a> and take it to the store. It’s important to note that regardless of <span class="math inline">\(n\)</span>, we always begin our selection from the top of Table <a href="#tab:mytbl-1">1</a> and work our way down.</p>
+<p>If <span class="math inline">\(n = 3\)</span>, we select bourbon, lemon, and sugar. For <span class="math inline">\(n = 5\)</span>, we add blended whiskey and powdered sugar.</p>
+<p>We define subset <em>performance</em> as the <strong>number of substantiated recipes for a given <span class="math inline">\(n\)</span></strong>.</p>
+<p>Figure <a href="#fig:count-selection-performance">1</a> illustrates the overall performance for all values of <span class="math inline">\(n\)</span>, adhering to the prescribed order in Table <a href="#tab:mytbl-1">1</a>.</p>
+<div class="figure" style="text-align: center"><span id="fig:count-selection-performance"></span>
+<img src="/post/2020-07-07-cocktails-2_files/figure-html/count-selection-performance-1.png" alt="Set selection performance based on occurrence frequency" width="672" />
+<p class="caption">
+Figure 1: Set selection performance based on occurrence frequency
+</p>
+</div>
+<p><br></p>
+<p>Utilizing the selection order provided by Table <a href="#tab:mytbl-1">1</a>, we would actually need to purchase <span class="math inline">\(n = 7\)</span> ingredients to fulfill our first recipe: Kentucky B &amp; B, which is comprised of only two ingredients: (1) bourbon &amp; (2) benedictine.</p>
+<p>Something isn’t right - why did we need to purchase 7 ingredients to make a Kentucky B &amp; B? This seems like a <em>waste</em> of shopping cart space. Frequency-based ingredient order is clearly not the optimal selection scheme for our <a href="#problem-statement">problem statement</a>.</p>
+</div>
+<div id="rethinking-the-approach" class="section level1">
+<h1>Rethinking the approach</h1>
+<p>We need to develop an algorithm that embodies the constraints of this problem more effectively than the frequency-based method above.</p>
+<p>For example, it is possible to select 7 ingredients to fulfill recipes for Kentucky B &amp; B (2), Algonquin (3), and Midnight Cowboy (2). The key observation is that the total amount of ingredients between these drinks sums to 7.</p>
+<p>There is an underlying logic here - any 2nd grader could outperform the frequency-based method when presented this problem (though I’m certainly not condoning underage drinking). But how do we translate this underlying logic into an algorithm?</p>
+<p>For each <span class="math inline">\(n\)</span>, we could try selecting the ingredient that results in fulfillment of <span class="math inline">\(1\)</span> or more recipes.</p>
+<pre class="r"><code>shopping_cart &lt;- character() # we start with an empty shopping cart
+
+choices &lt;- unique(whiskey$ingredient)
+  
+n_recipe_fulfilled &lt;- integer()
+
+# for each choice, how many recipes are fulfilled?
+for (j in seq_along(choices)) {
+  n_recipe_fulfilled[j] &lt;- whiskey %&gt;% 
+    with_groups(drink,
+                filter,
+                all(ingredient %in% c(choices[j], shopping_cart))) %&gt;% 
+    count(drink) %&gt;% 
+    nrow()
+}
+
+choices[n_recipe_fulfilled &gt; 0]</code></pre>
+<pre><code>## character(0)</code></pre>
+<p>But there are no drinks comprised of only <span class="math inline">\(1\)</span> ingredient! If this routine will not work for <span class="math inline">\(n = 1\)</span>, we certainly cannot generalize it for any arbitrary <span class="math inline">\(n\)</span>.</p>
+<p>We can augment this approach by revisiting the <code>n_recipe_fulfilled</code> vector, which currently displays fulfilled recipes for a given ingredient choice. If this vector consists of all zeroes, then our algorithm reaches a dead end.</p>
+<pre><code>##  [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+## [24] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+## [47] 0 0 0 0 0 0 0 0 0 0</code></pre>
+<p>Despite the above result consisting of all zeroes, there <em>has</em> to be an optimal choice. We need to increase the level of granularity available to the algorithm at each <span class="math inline">\(n\)</span>.</p>
+<p>Suppose, again, that <span class="math inline">\(n = 1\)</span>: we currently have <span class="math inline">\(0\)</span> ingredients, and we need to choose <span class="math inline">\(1\)</span>.</p>
+<p>For concise display, we sample <span class="math inline">\(4\)</span> drinks from <code>whiskey</code>.</p>
+<p>Each shaded block in Figure <a href="#fig:squares-init">2</a> represents an unfulfilled ingredient.</p>
+<div class="figure" style="text-align: center"><span id="fig:squares-init"></span>
+<img src="/post/2020-07-07-cocktails-2_files/figure-html/squares-init-1.png" alt="Remaining ingredients in sample" width="672" />
+<p class="caption">
+Figure 2: Remaining ingredients in sample
+</p>
+</div>
+<p>Between these drinks, there are <span class="math inline">\(16\)</span> distinct ingredients. For <span class="math inline">\(n = 1\)</span>, this implies <span class="math inline">\(16\)</span> choices.</p>
+<p>Each choice will reduce the count of ingredients (shaded blocks) in <em>some</em> capacity - it may just be one drink, or multiple drinks, that see a decrease in unfulfilled ingredients.</p>
+<p>In Figure <a href="#fig:squares-first">3</a>, we have selected <code>sugar</code> - this brings us <em>1 ingredient closer</em> to fully substantiating multiple drinks.</p>
+<div class="figure" style="text-align: center"><span id="fig:squares-first"></span>
+<img src="/post/2020-07-07-cocktails-2_files/figure-html/squares-first-1.png" alt="Drink sample ingredients after `sugar` removed" width="672" />
+<p class="caption">
+Figure 3: Drink sample ingredients after <code>sugar</code> removed
+</p>
+</div>
+<p>We can notate the remaining ingredients in each drink as a vector: <span class="math display">\[n\_ingredients\_remaining_{sugar} = [5, 3, 5, 6]\]</span></p>
+<p>We then proceed to create a <span class="math inline">\(n\_ingredients\_remaining\)</span> vector for all choices - concatenating the results into a <span class="math inline">\(c \times d\)</span> matrix, where <span class="math inline">\(c\)</span> is the number of choices at the <span class="math inline">\(n^{th}\)</span> iteration and <span class="math inline">\(d\)</span> is the number of drinks.</p>
+<pre class="r"><code>choices &lt;- unique(whiskey_sample$ingredient)
+
+n_ingredients_remaining &lt;- whiskey_sample %&gt;% 
+  group_by(drink) %&gt;% 
+  summarise(y = list(ingredient), .groups = &quot;drop&quot;) %&gt;% 
+  crossing(choice = choices) %&gt;% 
+  rowwise() %&gt;% 
+  mutate(y = length(y[!y %in% choice])) %&gt;% 
+  ungroup() %&gt;% 
+  arrange(choice, drink) %&gt;% 
+  pivot_wider(values_from = y, names_from = drink)</code></pre>
+<p style="text-align: center">
+<caption>
+<span id="tab:mytbl-2">Table 2: </span><code>n_ingredients_remaining</code> matrix
+</caption>
+</p>
+<p><div id="htmlwidget-2" class="reactable html-widget" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-2">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"choice":["angostura bitters","blackberry brandy","bourbon","club soda","coffee","dry vermouth","ice","irish whiskey","lemon juice","lemon peel","maraschino cherry","orange","orange peel","sugar","sweet vermouth","whipped cream"],"Allegheny":[5,4,4,5,5,4,5,5,4,4,5,5,5,5,5,5],"Irish Coffee":[4,4,4,4,3,4,4,3,4,4,4,4,4,3,4,3],"John Collins":[6,6,5,5,6,6,6,6,5,6,5,5,6,5,6,6],"Manhattan":[5,6,5,6,6,6,5,6,6,6,5,6,5,6,5,6]},"columns":[{"accessor":"choice","name":"choice","type":"character"},{"accessor":"Allegheny","name":"Allegheny","type":"numeric"},{"accessor":"Irish Coffee","name":"Irish Coffee","type":"numeric"},{"accessor":"John Collins","name":"John Collins","type":"numeric"},{"accessor":"Manhattan","name":"Manhattan","type":"numeric"}],"defaultPageSize":10,"paginationType":"numbers","showPageInfo":true,"minRows":1,"compact":true,"dataKey":"e8501e8a242c0f03f8cdccde139ff685"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+<br>
+From here, how do we decide which choice is best?</p>
+<ul>
+<li>Select row with lowest number. <span style="color: #FF5B16">But what if the minimum number is repeated across multiple columns? This method is not capable of identifying <span class="math inline">\(c_2\)</span> as the optimal choice.</span>
+<span class="math display">\[c_1 = [2, 2, 5, 6, 3]\]</span>
+<span class="math display">\[c_2 = [2, 2, 5, 6, 2]\]</span></li>
+<li>Select row with lowest sum. <span style="color: #FF5B16">This would incorrectly prioritize <span class="math inline">\(c_3\)</span> over <span class="math inline">\(c_4\)</span>.</span>
+<span class="math display">\[c_3 = [1, 4, 4, 4, 4, 4, 4]\]</span>
+<span class="math display">\[c_4 = [0, 5, 5, 5, 5, 5, 5]\]</span></li>
+<li>Select row with lowest sum of squares.<span style="color: #FF5B16">Although this method is a step in the right direction, it would incorrectly select <span class="math inline">\(c_5\)</span> over <span class="math inline">\(c_6\)</span></span>
+<span class="math display">\[c_5\bullet c_5 = 5^2 + 2^2 + 4^2 + 2^2 = 49\]</span>
+<span class="math display">\[c_6\bullet c_6 = 5^2 + 2^2 + 5^2 + 0 = 54\]</span></li>
+</ul>
+<p>What we need is a transformation function that amplifies values as they approach 0. We accomplish this with an exponential function.</p>
+<p><span class="math display">\[y = e ^ \frac{4}{1 + 5x}\]</span></p>
+<p>For each <span class="math inline">\(n\)</span>, we apply this transformation to each element in the <span class="math inline">\(c \times d\)</span> matrix and select the row containing the <em>maximum</em> sum.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>Figure <a href="#fig:squares-animate">4</a> shows how this logic applies to our example, for all values <span class="math inline">\(n = 1, 2, ..., 13\)</span>.</p>
+<div class="figure" style="text-align: center"><span id="fig:squares-animate"></span>
+<img src="/post/2020-07-07-cocktails-2_files/figure-html/squares-animate-1.gif" alt="Selection order utilizing remaining-ingredient matrix + transformation fn"  />
+<p class="caption">
+Figure 4: Selection order utilizing remaining-ingredient matrix + transformation fn
+</p>
+</div>
+<p>I have written a function that performs this algorithm on any dataset sharing a similar structure to <code>cocktails</code>. You can find the implemented form on my <a href="https://github.com/sccmckenzie/cocktail-ingredients/blob/master/selection-algorithm.R">Github</a> - this blog post will be updated once I have a chance to create a package for it.</p>
+<p>Since the actual form is heavy with <code>rlang</code> syntax, I’ve shown a simplified version below.</p>
+<pre class="r"><code># inventory: ingredients already chosen prior to nth iteration
+
+selection_simplified &lt;- function(inventory) {
+  choices &lt;- setdiff(unique(pull(whiskey, ingredient)), inventory)
+  
+  a &lt;- whiskey %&gt;% 
+    filter(!ingredient %in% inventory) %&gt;% 
+    group_by(drink) %&gt;% 
+    summarise(y = list(ingredient), .groups = &quot;drop&quot;) %&gt;% 
+    crossing(c = choices) %&gt;% 
+    rowwise() %&gt;% 
+    mutate(y = length(y[!y %in% c]),
+           y = exp(4 / (1 + 5 * y))) %&gt;% 
+    ungroup() %&gt;% 
+    arrange(c, drink)
+  
+  with(a, 
+       matrix(y, 
+              ncol = n_distinct(c), 
+              dimnames = list(unique(drink), unique(c))
+       )
+  ) %&gt;% 
+    colSums() %&gt;% 
+    which.max() %&gt;% 
+    names()
+}</code></pre>
+<p>Since the objective at each iteration is exactly the same, the ultimate value of <span class="math inline">\(n\)</span> does not impact the optimal selection order, hence we only need to apply <code>selection_simplified</code> to <code>whiskey</code> once.</p>
+<p>Mathematically, if we label the output as vector <span class="math inline">\(out\)</span>: <span class="math display">\[out_{i,\,n\,=\,j} = out_{i,\,n\,&gt;\,j}\]</span> <span class="math display">\[where\,\,i &lt;= j\]</span></p>
+<pre class="r"><code>out &lt;- character(length = n_distinct(whiskey$ingredient))
+
+for (i in seq_along(out)) {
+  out[i] &lt;- selection_simplified(out)
+}
+
+out # optimized ingredient selection order</code></pre>
+<pre><code>##  [1] &quot;bourbon&quot;           &quot;benedictine&quot;       &quot;lemon peel&quot;       
+##  [4] &quot;sugar&quot;             &quot;water&quot;             &quot;lemon juice&quot;      
+##  [7] &quot;angostura bitters&quot; &quot;maraschino cherry&quot; &quot;orange&quot;           
+## [10] &quot;bitters&quot;           &quot;club soda&quot;         &quot;dry vermouth&quot;     
+## [13] &quot;blackberry brandy&quot; &quot;blended whiskey&quot;   &quot;pineapple juice&quot;  
+## [16] &quot;lemon&quot;             &quot;lime&quot;              &quot;cherry&quot;           
+## [19] &quot;powdered sugar&quot;    &quot;egg white&quot;         &quot;red wine&quot;         
+## [22] &quot;carbonated water&quot;  &quot;light rum&quot;         &quot;brandy&quot;           
+## [25] &quot;grenadine&quot;         &quot;port&quot;              &quot;coca-cola&quot;        
+## [28] &quot;vanilla ice-cream&quot; &quot;whiskey&quot;           &quot;hot damn&quot;         
+## [31] &quot;dark rum&quot;          &quot;heavy cream&quot;       &quot;peychaud bitters&quot; 
+## [34] &quot;ricard&quot;            &quot;ice&quot;               &quot;vanilla extract&quot;  
+## [37] &quot;tennessee whiskey&quot; &quot;beer&quot;              &quot;lemonade&quot;         
+## [40] &quot;orange peel&quot;       &quot;sweet vermouth&quot;    &quot;irish whiskey&quot;    
+## [43] &quot;coffee&quot;            &quot;irish cream&quot;       &quot;whipped cream&quot;    
+## [46] &quot;orange juice&quot;      &quot;vodka&quot;             &quot;peach brandy&quot;     
+## [49] &quot;sweet and sour&quot;    &quot;rum&quot;               &quot;rye whiskey&quot;      
+## [52] &quot;tea&quot;               &quot;egg yolk&quot;          &quot;milk&quot;             
+## [55] &quot;nutmeg&quot;            &quot;salt&quot;</code></pre>
+</div>
+<div id="results" class="section level1">
+<h1>Results</h1>
+<p>Figure <a href="#fig:algorithm-performance">5</a> clearly demonstrates the algorithm outperforms the frequency-based selection scheme discussed in the introduction.</p>
+<div class="figure" style="text-align: center"><span id="fig:algorithm-performance"></span>
+<img src="/post/2020-07-07-cocktails-2_files/figure-html/algorithm-performance-1.png" alt="Selection method performance for `whiskey` dataset" width="672" />
+<p class="caption">
+Figure 5: Selection method performance for <code>whiskey</code> dataset
+</p>
+</div>
+<p>In Figure <a href="#fig:algorithm-performance-sample">6</a>, we we apply these methods to a random sample of drinks from <code>cocktails</code>. Again, the algorithm outperforms the frequency-based method.</p>
+<div class="figure" style="text-align: center"><span id="fig:algorithm-performance-sample"></span>
+<img src="/post/2020-07-07-cocktails-2_files/figure-html/algorithm-performance-sample-1.png" alt="Selection method performance for random sample of 20 drinks" width="672" />
+<p class="caption">
+Figure 6: Selection method performance for random sample of 20 drinks
+</p>
+</div>
+<p>We quantify the performance improvement, <span class="math inline">\(p_a\)</span>, by computing the ratio of area under the curves.</p>
+<p><img src="/post/2020-07-07-cocktails-2_files/figure-html/unnamed-chunk-14-1.png" width="672" />
+<span class="math display">\[p_a = \frac{A_1}{A_2}\]</span>
+The below code takes <span class="math inline">\(50\)</span> samples of <span class="math inline">\(20\)</span> drinks from <code>cocktails</code>, calculates the algorithm &amp; frequency-based set order, and computes area under the curve.</p>
+<p>The function <code>selection_path</code> is the implemented version of <code>selection_simplified</code>, found on my <a href="https://github.com/sccmckenzie/cocktail-ingredients/blob/master/selection-algorithm.R">Github</a>.</p>
+<p><code>capability2</code> calculates set performance for all values of <span class="math inline">\(n\)</span> - we integrate this vector using <code>stats::diffinv</code> to obtain area under performance curve.</p>
+<pre class="r"><code>cocktail_splits &lt;- list()
+
+set.seed(2020)
+
+for (i in 1:50) {
+  cocktail_splits[[i]] &lt;- cocktails %&gt;% 
+    filter(drink %in% sample(unique(drink), size = 20))
+}
+
+performance_bootstraps &lt;- tibble(cocktail_splits) %&gt;% 
+  mutate(
+    # calculate set based on algorithm
+    algorithm = map(.x = cocktail_splits,
+                    .f = selection_path,
+                    ingredient,
+                    drink),
+    
+    # calculate set based on frequency
+    frequency = map(cocktail_splits, ~ {
+      count(..1, ingredient, sort = T) %&gt;% 
+        pull(ingredient)
+    })
+  ) %&gt;% 
+  mutate(across(c(algorithm, frequency), ~ {
+    # calculate area under each performance curve
+    map2_dbl(.x, cocktail_splits, ~ {
+      capability2(..1, ..2, drink, ingredient) %&gt;%
+        fill(performance, .direction = &quot;down&quot;) %&gt;% 
+        pull(performance) %&gt;% 
+        diffinv(xi = 0) %&gt;% 
+        tail(1)
+    }
+  }))) %&gt;% 
+  transmute(id = row_number(),
+            pa = algorithm / frequency)</code></pre>
+<p>As shown by the histogram in Figure <a href="#fig:bootstrap-plot">7</a>, the algorithm method consistently performs better by at least 44%.</p>
+<div class="figure" style="text-align: center"><span id="fig:bootstrap-plot"></span>
+<img src="/post/2020-07-07-cocktails-2_files/figure-html/bootstrap-plot-1.png" alt="Histogram: Relative performance of algorithmic over frequency-based selection" width="672" />
+<p class="caption">
+Figure 7: Histogram: Relative performance of algorithmic over frequency-based selection
+</p>
+</div>
+<div id="finally" class="section level2">
+<h2>Finally!</h2>
+<p>If you’re going shopping for whiskey-based cocktails, Figure <a href="#fig:whiskey-grid">8</a> is what you want to take with you. This provides an exploded-view of the algorithm-based selection for <code>whiskey</code>. Check out my <a href = "https://sccm.shinyapps.io/cocktail-ingredients/" target = "_blank">Shiny app</a> that provides the below grid for numerous subsets of cocktails!</p>
+<div class="figure" style="text-align: center"><span id="fig:whiskey-grid"></span>
+<img src="/post/2020-07-07-cocktails-2_files/figure-html/whiskey-grid-1.png" alt="Ingredient grid for `whiskey` dataset" width="768" />
+<p class="caption">
+Figure 8: Ingredient grid for <code>whiskey</code> dataset
+</p>
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>The method we will end up using for this problem leaves room for assigning weights - I may include this functionality in a package<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>In the future, it would be interesting to augment the algorithm to <em>look ahead</em> by several iterations, taking the hypothetical performance of future junctions into consideration. Suppose the 1st-order metric used in this post ranks choices A &amp; B roughly equivalent - does choice A lead to another set of choices that contain a better outcome than those offered by B? What about choices 2 steps after A &amp; B? One could extend this logic to the <span class="math inline">\(n^{th}\)</span>-order, depending on computational resources.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
