@@ -114,7 +114,7 @@ k_crossover <- tibble(n = 3:10,
 k_crossover
 ```
 
-```{r k-crossover-area, echo = FALSE, fig.cap = "red points represent locations where it becomes more advantagous to switch to polygon with $n - 1$ sides (with increasing $k$)", fig.align="center"}
+```{r k-crossover-area, echo = FALSE, fig.cap = "Red points represent locations where it becomes more advantagous to switch to polygon with $n - 1$ sides (with increasing $k$)", fig.align="center"}
 tibble(n = 3:7) %>% 
   mutate(data = map(n, ~ {
     k_max <- 1/.x
