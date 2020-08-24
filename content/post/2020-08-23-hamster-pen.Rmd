@@ -114,20 +114,6 @@ k_crossover <- tibble(n = 3:10,
 k_crossover
 ```
 
-```{r k-crossover, echo = FALSE, fig.cap = "Each point represents the *highest* value of $k$ where one would wish to maintain current shape before reducing $n$ by $1$", fig.align="center"}
-k_range <- tibble(n = 3:10) %>% 
-  mutate(k_max = 1/n)
-  
-
-k_crossover %>% 
-  ggplot() +
-  geom_segment(aes(x = n, xend = n, y = 0, yend = k_max), data = k_range) +
-  geom_point(aes(n, k), color = "#E84A5F", size = 3) +
-  scale_x_continuous(breaks = 3:10) +
-  theme(panel.grid.minor = element_blank()) +
-  labs(title = "Shape Threshold Values", subtitle = "Points superimposed on allowable ranges for k", y = "")
-```
-
 ```{r k-crossover-area, echo = FALSE, fig.cap = "red points represent locations where it becomes more advantagous to switch to polygon with $n - 1$ sides (with increasing $k$)", fig.align="center"}
 tibble(n = 3:7) %>% 
   mutate(data = map(n, ~ {
