@@ -37,4 +37,17 @@ ggplot(df) +
   geom_line(aes(t, f))
 ```
 
+For more details, click [here](https://sccmckenzie.github.io/meandr/)!
 
+I also wrote a [detailed case study](https://sccmckenzie.github.io/meandr/articles/case.html) about the problem that originally inspired me to create this package.
+
+## Reflections
+
+Altogether, this experience has given me an immense appreciate for how much work goes into package creation. If you've never created a package before, I highly suggest two resources:
+
+* [R Packages](https://r-pkgs.org/) by Hadley Wickham and Jenny Bryan. This book champions the **usethis** package, which is a must.
+* Additionally, you might also check out [Chapter 7](https://adv-r.hadley.nz/environments.html) from Hadley's Advanced R. This provides thorough explanation of **R Namespaces** - having a deep understanding of this material will make package creation must less daunting.
+
+Finally, I should give credit to Dave Robinson's talk, ["The Unreasonable Effectiveness of Public Work"](https://rstudio.com/resources/rstudioconf-2019/the-unreasonable-effectiveness-of-public-work/). Listening to this talk was one of the most inspirational experiences of my professional life.
+
+No matter where you are in your Data Science journey, sharing your work is one of the most meaningful things you can do for the world.
