@@ -1,0 +1,40 @@
+---
+title: My First R Package!
+description: 'Quick description & reflections'
+author: Scott McKenzie
+date: '2020-11-03'
+slug: my-first-package
+categories: []
+tags: []
+---
+
+**meandr** allows for easy generation of coordinates that are random, yet continuously differentiable. This is particularly useful for simulating time-series measurements of physical phenomena that maintain a clear local trajectory.
+
+Essentially, **meandr** provides an alternative to `rnorm` for noise generation.
+
+
+```{r echo = FALSE}
+set.seed(17)
+```
+
+
+## Quick Example
+
+You can call `meandr()` without any arguments! Each call returns a `tibble` of coordinates.
+```{r}
+library(meandr)
+
+df <- meandr()
+
+df
+```
+
+```{r echo = FALSE}
+library(ggplot2)
+theme_set(theme_minimal())
+
+ggplot(df) +
+  geom_line(aes(t, f))
+```
+
+

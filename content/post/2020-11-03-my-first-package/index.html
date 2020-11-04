@@ -1,0 +1,39 @@
+---
+title: My First R Package!
+description: 'Quick description & reflections'
+author: Scott McKenzie
+date: '2020-11-03'
+slug: my-first-package
+categories: []
+tags: []
+---
+
+<script src="index_files/header-attrs/header-attrs.js"></script>
+
+
+<p><strong>meandr</strong> allows for easy generation of coordinates that are random, yet continuously differentiable. This is particularly useful for simulating time-series measurements of physical phenomena that maintain a clear local trajectory.</p>
+<p>Essentially, <strong>meandr</strong> provides an alternative to <code>rnorm</code> for noise generation.</p>
+<div id="quick-example" class="section level2">
+<h2>Quick Example</h2>
+<p>You can call <code>meandr()</code> without any arguments! Each call returns a <code>tibble</code> of coordinates.</p>
+<pre class="r"><code>library(meandr)
+
+df &lt;- meandr()
+
+df</code></pre>
+<pre><code>## # A tibble: 100 x 2
+##         t       f
+##     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 0.01   -0.0128
+##  2 0.02   -0.0513
+##  3 0.03   -0.0897
+##  4 0.04   -0.128 
+##  5 0.05   -0.167 
+##  6 0.06   -0.179 
+##  7 0.0700 -0.192 
+##  8 0.08   -0.205 
+##  9 0.09   -0.192 
+## 10 0.10   -0.179 
+## # ... with 90 more rows</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
