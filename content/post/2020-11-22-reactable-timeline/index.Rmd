@@ -11,13 +11,6 @@ tags:
   - timeline
 ---
 
-```{css echo = FALSE}
-.reactable {
-  position: relative;
-  left: -120px;
-}
-```
-
 
 ```{r libraries, echo = FALSE, include = FALSE}
 library(tidyverse)

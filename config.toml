@@ -1,7 +1,7 @@
 # Site settings
 baseurl = "https://sccm.io/"
 languageCode = "en"
-title = "sccm"
+title = "Scott McKenzie"
 theme = "hugo-theme-cactus-plus"
 googleAnalytics = "your_google_analytics_id"
 # Set the value to true if your site include CJK (Chinese, Japanese, and Korean languages) characters
@@ -15,9 +15,9 @@ enableEmoji = true
     post = "/:slug/"
 
 [params]
-	author = "sccm"
+	author = "Scott McKenzie"
 	description = "Data Science Blog"
-	bio = "Illuminating Complex Systems with Data"
+	bio = "Illuminating Complex Systems with Analytics"
 
 	twitter = "@sccmckenzie"
 
@@ -83,7 +83,7 @@ enableEmoji = true
 	twitter-square = "https://www.twitter.com/sccmckenzie"
 	github-square = "https://www.github.com/sccmckenzie"
 	linkedin-square = "https://www.linkedin.com/in/scott-mckenzie-9b877294/"
-	instagram = "https://www.instagram.com/scottmckenzie93/"
+	instagram = "https://www.instagram.com/sccmckenzie/"
 	
 [markup.goldmark.renderer]
   unsafe = true
