@@ -43,7 +43,7 @@ I also wrote a [detailed case study](https://sccmckenzie.github.io/meandr/articl
 
 ## Reflections
 
-Altogether, this experience has given me an immense appreciate for how much work goes into package creation. If you've never created a package before, I highly suggest two resources:
+Altogether, this experience has given me an immense appreciation for how much work goes into package creation. If you've never created a package before, I highly suggest two resources:
 
 * [R Packages](https://r-pkgs.org/) by Hadley Wickham and Jenny Bryan. This book champions the **usethis** package, which is a must.
 * Additionally, you might also check out [Chapter 7](https://adv-r.hadley.nz/environments.html) from Hadley's Advanced R. This provides thorough explanation of **R Namespaces** - having a deep understanding of this material will make package creation must less daunting.
