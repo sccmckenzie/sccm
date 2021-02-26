@@ -72,22 +72,21 @@ create_timeline_bar <- function(left = 0, width = "100%", fill = "#00bfc4") {
 
 In this post, I will demonstrate how to create the below timeline using [reactable](https://glin.github.io/reactable/).
 
-```{r echo = FALSE, fig.align = "center"}
+```{r echo = FALSE}
 df <- store_records %>% 
   mutate(timestamps = convert_timestamps(enter, exit))
 
 reactable(df,
           fullWidth = FALSE,
-          width = 905,
           compact = TRUE,
           bordered = TRUE,
           columns = list(
             customer = colDef(width = 100),
-            revenue = colDef(width = 100, format = colFormat(digits = 1)),
-            enter = colDef(width = 200, format = colFormat(datetime = TRUE)),
-            exit = colDef(width = 200, format = colFormat(datetime = TRUE)),
+            revenue = colDef(width = 90, format = colFormat(digits = 1)),
+            enter = colDef(width = 110, format = colFormat(time = TRUE)),
+            exit = colDef(width = 110, format = colFormat(time = TRUE)),
             timestamps = colDef(
-              width = 300,
+              width = 155,
               cell = function(value) {
                 create_timeline_bar(left = value[[1]], width = value[[2]])
               }
@@ -113,7 +112,8 @@ First, let's load the data.
 ```{r message = FALSE}
 library(tidyverse)
 
-store_records <- read_csv("https://raw.githubusercontent.com/sccmckenzie/reactable-timeline/master/customer_df.csv")
+url <- "https://raw.githubusercontent.com/sccmckenzie/reactable-timeline/master/customer_df.csv"
+store_records <- read_csv(url)
 ```
 
 This is a simple dataset that I created for demonstration. It contains store records of customer revenue for 2020-02-03.
@@ -206,22 +206,21 @@ store_records %>%
   mutate(timestamps = convert_timestamps(enter, exit)) %>% 
   # ^ created in Step 1
   reactable(fullWidth = FALSE,
-            width = 905,
             compact = TRUE,
             bordered = TRUE,
             columns = list(
               customer = colDef(width = 100),
-              revenue = colDef(width = 100, format = colFormat(digits = 1)),
-              enter = colDef(width = 200, format = colFormat(datetime = TRUE)),
-              exit = colDef(width = 200, format = colFormat(datetime = TRUE)),
+              revenue = colDef(width = 90, format = colFormat(digits = 1)),
+              enter = colDef(width = 110, format = colFormat(time = TRUE)),
+              exit = colDef(width = 110, format = colFormat(time = TRUE)),
               timestamps = colDef(
-                width = 300,
+                width = 155,
                 cell = function(value) {
                   create_timeline_bar(left = value[[1]], width = value[[2]])
                   # ^ created in Step 2
                 }
               )
             )
-)
+  )
 ```
 
