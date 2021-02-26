@@ -3,7 +3,9 @@ Rproj.user
 .RData
 .Ruserdata
 sccm.Rproj
-public/
-blogdown/
+/public/
+/blogdown/
 resources/
 .Rproj.user/
+.DS_Store
+Thumbs.db
