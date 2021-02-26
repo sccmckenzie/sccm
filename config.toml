@@ -17,7 +17,7 @@ enableEmoji = true
 [params]
 	author = "Scott McKenzie"
 	description = "Data Science Blog"
-	bio = "Illuminating Complex Systems with Analytics"
+	bio = "Illuminating Analytics"
 
 	twitter = "@sccmckenzie"
 
