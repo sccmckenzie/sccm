@@ -167,8 +167,7 @@ Below we access Mopac & Steck Ave traffic volume measurements from COA open data
 ```{r message = FALSE}
 library(jsonlite)
 
-api_url <- 'https://data.austintexas.gov/resource/sh59-i6y9.json?atd_device_id=6409&year=2020&month=5&day=20&heavy_vehicle=false'
-steck <- fromJSON(api_url) %>% 
+steck <- fromJSON('https://data.austintexas.gov/resource/sh59-i6y9.json?atd_device_id=6409&year=2020&month=5&day=20&heavy_vehicle=false') %>% 
   as_tibble() %>% 
   janitor::clean_names() %>% 
   transmute(read_date = as_datetime(read_date, tz = "US/Central"),
@@ -182,23 +181,7 @@ Each row contains measurements summarized over 15 minutes intervals.
 steck %>% 
   sample_n(5)
 ```
-
-```{r, message = FALSE, fig.height = 3}
-steck %>% 
-  group_by(read_date) %>% 
-  summarize(volume = sum(volume)) %>% 
-  ggplot(aes(read_date, volume)) +
-  geom_line(size = 1.5) +
-  scale_x_datetime(date_breaks = "3 hours", date_labels = "%R") +
-  labs(title = "Traffic Volume at Mopac & Steck Ave",
-       subtitle = "Summed over 15 min intervals",
-       caption = "Data: City of Austin",
-       x = NULL, y = NULL)
-```
-
-The above distribution is much more believable: starting around 6am, traffic increases, levels out, gets worse around lunch, and finally recedes after 6pm.
-
-The above chart includes traffic in all 4 directions. Below, we restrict our focus to north & south as these are the only directions that could correspond to cars entering Mopac.
+Here, we restrict our focus to north & south as these are the only directions that could correspond to cars entering Mopac.
 
 ```{r, message = FALSE, fig.height=3}
 steck %>% 
@@ -215,6 +198,8 @@ steck %>%
        caption = "Data: City of Austin",
        x = NULL, y = NULL)
 ```
+
+The above distribution is much more believable: starting around 6am, traffic increases, levels out, gets worse around lunch, and finally recedes after 6pm.
 
 The large discrepancy between north & south may be due to the fact that it's extremely difficult to get on northbound Mopac from Steck Ave. In other words, people may be opting for an alternate access point if they are travelling north.
 
