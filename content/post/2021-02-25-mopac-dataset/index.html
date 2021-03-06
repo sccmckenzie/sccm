@@ -11,51 +11,68 @@ tags:
 <script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
 
 
-<p>In this post I will explain how I simulated vehicle records for the <a href="https://www.mobilityauthority.com/traveler-info/open-roads/MoPac-Express">Texas Loop 1 (Mopac) Express Lane</a>.</p>
-<!-- Final result goes here -->
-<p>To showcase the functionality of my upcoming package, <a href="https://github.com/sccmckenzie/sift">sift</a>, I needed the <strong>perfect</strong> dataset - the idiosyncrasies of which will be discussed in a future post. Suffice to say, I felt inspired to concoct something from scratch.</p>
+<p>In this post I will explain how I simulated vehicle records for the <a href="https://www.mobilityauthority.com/traveler-info/open-roads/MoPac-Express">Mopac Express Lane</a> in Austin, Texas.</p>
+<!-- Photo goes here -->
+<div id="motivation" class="section level1">
+<h1>Motivation</h1>
+<p>I am currently working towards the release of my second R package, <a href="https://github.com/sccmckenzie/sift">sift</a>. This package is essentially an amalgam of various ideas I’ve had over the past few years. Since grouping these ideas into one package was very important to me, I needed a common theme to tie all of the functions together.</p>
+<p>The dataset created in this post, <strong><code>express</code></strong>, serves as a realistic case study where one can effectively utilize the full capability of <a href="https://github.com/sccmckenzie/sift">sift</a>.</p>
+</div>
 <div id="step-1-reconnaissance" class="section level1">
 <h1>Step 1: Reconnaissance</h1>
 <p>How frequent are various vehicle types on Mopac? Lots of F-150s? Toyota Camrys?</p>
 <p>By no means does the intended application of the dataset require 100% accuracy. However, achieving something somewhat realistic was still important to me. After coming up dry on Google, I decided to walk out my front door and get the answer from the primary source.</p>
-<p>Discreetly nestled in a grove overlooking Mopac, I aimed my camera at rush hour traffic and let the shutter sing for 2.5 minutes. After repeating this over the course of 1 week, I had collected over 600 frames.</p>
-<p><img src="mopac-collage.png" /></p>
-<p>Yes, I was a little nervous that someone might mistake my benign endeavor for something more sinister - or worse, turn it into a TikTok sensation.</p>
-<p>Perhaps someday I’ll experiment with creating a Machine Learning algorithm to automatically classify these photos. It took over 8 hours to manually capture all 962 observations.</p>
-<div id="raw-observations" class="section level3">
-<h3>Raw Observations</h3>
+<p>Discreetly nestled in a grove overlooking Mopac, I aimed my camera at rush hour traffic and let the shutter snap for 2.5 minutes. After repeating this over the course of 1 week, I had collected over 600 frames.</p>
+<!-- Put collage here -->
+<p>Someday, these photos will serve as an excellent a Machine Learning algorithm to automatically classify the photos. It took over 8 hours of data entry to transcribe all 962 observations.</p>
+<p><strong>I’ve named this dataset <code>rush_hour</code>.</strong></p>
 <pre class="r"><code>library(tidyverse)
 
-url &lt;- &quot;https://raw.githubusercontent.com/sccmckenzie/mopac/master/inst/extdata/rush_hour.csv&quot;
-rush_hour &lt;- read_csv(url, locale = locale(tz = &quot;US/Central&quot;))
+options(readr.default_locale = locale(tz = &quot;US/Central&quot;))
+
+rush_hour &lt;- read_csv(&quot;https://raw.githubusercontent.com/sccmckenzie/mopac/master/inst/extdata/rush_hour.csv&quot;)
 # also available in mopac::rush_hour
 
 rush_hour %&gt;% 
   sample_n(10)</code></pre>
 <pre><code>## # A tibble: 10 x 7
-##    day   time                commercial color type  make   model     
-##    &lt;chr&gt; &lt;dttm&gt;              &lt;lgl&gt;      &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;     
-##  1 Tue   2020-05-19 18:41:55 FALSE      Black Truck GMC    Sierra    
-##  2 Sat   2020-05-23 15:06:11 FALSE      Black SUV   Toyota Sequoia   
-##  3 Sun   2020-05-17 17:29:06 FALSE      White Sedan BMW    3-Series  
-##  4 Sat   2020-05-23 15:06:03 FALSE      White SUV   Toyota Rav-4     
-##  5 Thu   2020-05-21 18:49:39 FALSE      Red   SUV   Chevy  Suburban  
-##  6 Wed   2020-05-20 18:29:22 FALSE      Red   SUV   Toyota Highlander
-##  7 Sun   2020-05-17 17:29:06 FALSE      Black SUV   Acura  RSX       
-##  8 Thu   2020-05-21 18:49:01 FALSE      Blue  Sedan Toyota Camry     
-##  9 Sat   2020-05-23 15:05:36 FALSE      Red   Sedan Chevy  Cruze     
-## 10 Fri   2020-05-22 18:46:08 FALSE      White Truck Chevy  Silverado</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-</div>
+##    day   time                commercial color  type  make     model    
+##    &lt;chr&gt; &lt;dttm&gt;              &lt;lgl&gt;      &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;    
+##  1 Sun   2020-05-17 17:27:07 FALSE      Blue   Van   Ford     Econoline
+##  2 Sat   2020-05-23 15:06:30 FALSE      Green  SUV   Jeep     Wrangler 
+##  3 Tue   2020-05-19 18:41:39 FALSE      White  Truck Chevy    Silverado
+##  4 Sun   2020-05-17 17:29:26 FALSE      Black  Truck Chevy    Silverado
+##  5 Wed   2020-05-20 18:27:57 FALSE      Silver Sedan Toyota   Corolla  
+##  6 Fri   2020-05-22 18:45:53 FALSE      Grey   Truck Chevy    Silverado
+##  7 Thu   2020-05-21 18:49:28 FALSE      Black  Sedan Mercedes C-Series 
+##  8 Sat   2020-05-23 15:06:25 FALSE      Grey   Truck Ford     F-150    
+##  9 Sat   2020-05-23 15:06:49 TRUE       White  Van   Ford     E-250    
+## 10 Fri   2020-05-22 18:46:39 FALSE      Black  Truck Ford     F-150</code></pre>
+<p>If you live in Texas, the below results shouldn’t come as a surprise.</p>
+<pre class="r"><code>rush_hour %&gt;% 
+  unite(make_model, make, model, sep = &quot; &quot;) %&gt;% 
+  drop_na(make_model) %&gt;% 
+  count(make_model) %&gt;% 
+  slice_max(order_by = n, n = 10) %&gt;% 
+  ggplot(aes(n, fct_reorder(make_model, n))) +
+  geom_col()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Although <strong><code>rush_hour</code></strong> satisfies the need for realistic vehicle make/model frequencies, it cannot serve as a basis for inferring time-series traffic density in the express lane since the observations were obtained from the Mopac mainlanes.</p>
+<p>To avoid further speculation, I made another trip dedicated solely to acquiring express lane timestamps (collected during afternoon rush hour).</p>
+<pre class="r"><code>express_counts &lt;- read_csv(&quot;https://raw.githubusercontent.com/sccmckenzie/mopac/master/inst/extdata/express_counts.csv&quot;)</code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   time = col_datetime(format = &quot;&quot;)
+## )</code></pre>
 </div>
 <div id="step-2-defining-scope" class="section level1">
 <h1>Step 2: Defining Scope</h1>
 <p>Mopac contains an express lane in both directions, stretching 11 miles from downtown Austin to Parmer Lane. Midway between these terminals, there is a checkpoint near Far West Blvd.</p>
 <ul>
 <li>Our mock dataset, <strong><code>express</code></strong>, will feature vehicle descriptions + timestamps <strong>as if they are captured at the Far West Blvd checkpoint.</strong></li>
-<li>We’ll obtain baseline traffic distribution by bootstrapping <strong><code>rush_hour</code></strong>, then adjusting based on City of Austin data.</li>
-<li>Vehicle make/model/color frequencies will be inferred from <strong><code>rush_hour</code></strong>.</li>
-<li>Although public service vehicles like metro buses utilize the Express Lane, we will exclude them here.</li>
+<li>We’ll obtain peak traffic distribution by bootstrapping <strong><code>express_counts</code></strong>, then adjusting based on City of Austin data.</li>
+<li>Vehicle make/model/color frequencies will be inferred from <strong><code>rush_hour</code></strong>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></li>
 </ul>
 </div>
 <div id="step-3-initial-traffic-distribution" class="section level1">
@@ -64,19 +81,17 @@ rush_hour %&gt;%
 
 # obtain vehicle spacing from rush_hour
 set.seed(10)
-t_delta &lt;- rush_hour %&gt;%
-  with_groups(day,
-              mutate,
-              t_delta = time_length(time - lag(time))) %&gt;%
+t_delta &lt;- express_counts %&gt;%
+  mutate(t_delta = time_length(time - lag(time))) %&gt;%
   drop_na(t_delta) %&gt;%
   # sprinkle some jitter into timestamps
   # (observations were recorded with 1 sec resolution - this needs to be finer)
-  mutate(t_delta = t_delta + 2 * rbeta(n(), 2, 5)) %&gt;% 
+  mutate(t_delta = t_delta + 2 * rbeta(n(), 2, 3)) %&gt;%
   pull(t_delta)
 
 head(t_delta)</code></pre>
-<pre><code>## [1] 2.5790310 0.4998850 0.1680447 1.3592328 1.6979074 1.7420320</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre><code>## [1] 2.809418 4.709490 6.246943 7.521672 3.951765 2.002280</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>To simulate timestamps for <strong><code>express</code></strong>, we perform bootstrap sampling from the above distribution.</p>
 <pre class="r"><code># set timeframe (5am - 8pm)
 t1 &lt;- 5 
@@ -91,26 +106,23 @@ express &lt;- tibble(direction = c(&quot;North&quot;, &quot;South&quot;)) %&gt;%
   # add temporal vehicle spacing together
   # &amp; cut off timestamps later than 8pm
   transmute(time = make_datetime(2020, 5, 20, t1, tz = &quot;US/Central&quot;) + cumsum(vehicle_spacing)) %&gt;% 
-  filter(time &lt; make_datetime(2020, 5, 20, t2, tz = &quot;US/Central&quot;)) %&gt;% 
-  # finally, we sample 1/4 of the dataset since there is only 1 express lane in each direction
-  # (rush_hour observations were captured across all 4 lanes of traffic)
-  sample_n(size = n() / 4)</code></pre>
+  filter(time &lt; make_datetime(2020, 5, 20, t2, tz = &quot;US/Central&quot;))</code></pre>
 <pre class="r"><code>express %&gt;%
   group_by(direction,
            t15 = floor_date(time, unit = &quot;15 minutes&quot;)) %&gt;% 
   summarize(volume = n()) %&gt;% 
   ggplot(aes(t15, volume)) +
   geom_line(aes(color = direction), size = 1.5) +
-  scale_y_continuous(limits = c(0, 160)) +
+  scale_y_continuous(limits = c(0, 200)) +
   labs(title = &quot;Simulated Traffic Volume at Mopac Express Lane (Far West)&quot;,
        subtitle = &quot;Summed over 15 min intervals&quot;,
        x = NULL, y = NULL)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-<p>The temporal uniformity shown above is unrealistic - we can do better.</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Throughout the entire day, the simulated traffic density stays roughly the same - this is unrealistic. For example, around 6:00am, almost nobody uses the express lane.</p>
 </div>
 <div id="step-4-exploring-city-of-austin-api" class="section level1">
 <h1>Step 4: Exploring City of Austin API</h1>
-<p>Although Texas state highway mainlane traffic count data is elusive (at least at the granularity needed for this application), the City of Austin (COA) provides ample resources on frontage road intersections.</p>
+<p>Although Texas state highway traffic count data is elusive (at least at the granularity needed for this application), the City of Austin (COA) provides ample resources on frontage road intersections.</p>
 <p>Below we access Mopac &amp; Steck Ave traffic volume measurements from COA open data portal. This intersection is located ~ 1.5mi north of Mopac &amp; Far West, which unfortunately doesn’t have records in the <a href="https://data.austintexas.gov/Transportation-and-Mobility/Camera-Traffic-Counts/sh59-i6y9">Camera Traffic Counts</a> table.</p>
 <pre class="r"><code>library(jsonlite)
 
@@ -128,11 +140,11 @@ steck &lt;- fromJSON(api_url) %&gt;%
 <pre><code>## # A tibble: 5 x 4
 ##   read_date           direction  movement   volume
 ##   &lt;dttm&gt;              &lt;chr&gt;      &lt;chr&gt;       &lt;int&gt;
-## 1 2020-05-20 17:45:00 SOUTHBOUND THRU           99
-## 2 2020-05-20 02:00:00 SOUTHBOUND RIGHT TURN      2
-## 3 2020-05-20 07:15:00 EASTBOUND  THRU           24
-## 4 2020-05-20 06:00:00 WESTBOUND  THRU            6
-## 5 2020-05-20 06:45:00 NORTHBOUND LEFT TURN       6</code></pre>
+## 1 2020-05-20 00:45:00 EASTBOUND  RIGHT TURN      2
+## 2 2020-05-20 07:15:00 NORTHBOUND THRU            9
+## 3 2020-05-20 10:30:00 NORTHBOUND LEFT TURN      15
+## 4 2020-05-20 01:00:00 SOUTHBOUND LEFT TURN       1
+## 5 2020-05-20 22:00:00 SOUTHBOUND THRU           12</code></pre>
 <pre class="r"><code>steck %&gt;% 
   group_by(read_date) %&gt;% 
   summarize(volume = sum(volume)) %&gt;% 
@@ -143,7 +155,7 @@ steck &lt;- fromJSON(api_url) %&gt;%
        subtitle = &quot;Summed over 15 min intervals&quot;,
        caption = &quot;Data: City of Austin&quot;,
        x = NULL, y = NULL)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>The above distribution is much more believable: starting around 6am, traffic increases, levels out, gets worse around lunch, and finally recedes after 6pm.</p>
 <p>The above chart includes traffic in all 4 directions. Below, we restrict our focus to north &amp; south as these are the only directions that could correspond to cars entering Mopac.</p>
 <pre class="r"><code>steck %&gt;% 
@@ -159,7 +171,7 @@ steck &lt;- fromJSON(api_url) %&gt;%
        subtitle = &quot;Summed over 15 min intervals&quot;,
        caption = &quot;Data: City of Austin&quot;,
        x = NULL, y = NULL)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <p>The large discrepancy between north &amp; south may be due to the fact that it’s extremely difficult to get on northbound Mopac from Steck Ave. In other words, people may be opting for an alternate access point if they are travelling north.</p>
 <p>For the sake of simplicity, we will project the SOUTHBOUND distribution onto our <strong><code>express</code></strong> dataset (both directions).</p>
 <pre class="r"><code>steck_normalized &lt;- steck %&gt;% 
@@ -182,23 +194,24 @@ express &lt;- express %&gt;%
   mutate(keep = sample(c(FALSE, TRUE), prob = c(1 - volume, volume), size = 1)) %&gt;% 
   ungroup() %&gt;% 
   filter(keep) %&gt;% 
-  select(direction, time)</code></pre>
+  select(direction, time) %&gt;% 
+  arrange_all()</code></pre>
 <pre class="r"><code>express %&gt;%
   group_by(direction,
            t15 = floor_date(time, unit = &quot;15 minutes&quot;)) %&gt;% 
   summarize(volume = n()) %&gt;% 
   ggplot(aes(t15, volume)) +
   geom_line(aes(color = direction), size = 1.5) +
-  scale_y_continuous(limits = c(0, 160)) +
+  scale_y_continuous(limits = c(0, 200)) +
   labs(title = &quot;Simulated Traffic Volume at Mopac Express Lane (Far West)&quot;,
        subtitle = &quot;Summed over 15 min intervals&quot;,
        x = NULL, y = NULL)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <p>Voila! Admittedly, this is a somewhat hackish method to achieve the desired result. For the intended purpose of this dataset, we don’t need to worry about using more sophisticated statistical techniques.</p>
 </div>
-<div id="step-5-vehicles" class="section level1">
-<h1>Step 5: Vehicles</h1>
-<p>Now that we’ve obtained our timestamps, it’s time to shift focus to adding vehicles.</p>
+<div id="step-5-timestamp-assignment" class="section level1">
+<h1>Step 5: Timestamp Assignment</h1>
+<p>Now it’s time to link actual vehicles to our timestamps.</p>
 <p>We are going to add 4 columns:</p>
 <ul>
 <li>License Plate</li>
@@ -207,10 +220,66 @@ express &lt;- express %&gt;%
 <li>Color</li>
 </ul>
 <p>We’ll save generation of the above permutations for the very end. For now, we will denote unique vehicles by integer <strong><code>v_id</code></strong>.</p>
-<p>Before we jump in, let’s outline possible scenarios. Since we cannot rely on COA open data portal to estimate weighting, I’ve assigned them myself.</p>
+<pre class="r"><code>express &lt;- express %&gt;% 
+  mutate(r_id = row_number(), # will save us headache later
+         v_id = NA_integer_)</code></pre>
+<p>Let’s outline possible scenarios. Since we cannot rely on COA open data portal to estimate weighting, I’ve assigned them myself.</p>
 <ul>
 <li><strong>A</strong>: Vehicle uses Express Lane once <strong>in both directions</strong> (e.g. commuting to &amp; from work) - 50%.</li>
 <li><strong>B</strong>: Vehicle uses Express Lane thrice <strong>in any combination of directions</strong> (e.g. rideshare) - 10%.</li>
 <li><strong>C</strong>: Vehicle uses Express Lane once <strong>in one direction</strong> (e.g. traffic wasn’t bad enough to justify using Express Lane in both directions) - 40%.</li>
 </ul>
+<p>The key challenge will be assigning <em>realistic</em> groups of timestamps to one vehicle. A simple call to <code>sample()</code> isn’t going to cut it.</p>
+<pre class="r"><code>hourday &lt;- function(t) {
+  time_length(t - make_datetime(2020, 5, 20, tz = &quot;US/Central&quot;), unit = &quot;hours&quot;)
+}
+
+n_a &lt;- nrow(express) * 0.5 # this needs refinement
+
+north &lt;-   express %&gt;% 
+  filter(direction == &quot;North&quot;) %&gt;% 
+  transmute(north = hourday(time))
+
+south &lt;- express %&gt;% 
+  filter(direction == &quot;South&quot;) %&gt;% 
+  transmute(south = hourday(time))
+
+set.seed(40)
+df &lt;- expand_grid(north, south) %&gt;% 
+  mutate(t_l = north - south,
+         a = if_else(t_l &gt; 0, south, north),
+         # a_id = if_else(t_l &gt; 0, s_id, n_id),
+         b = if_else(t_l &gt; 0, north, south),
+         # b_id = if_else(t_l &gt; 0, n_id, s_id)
+         ) %&gt;%  
+  filter(t_l &gt; 0.5) %&gt;% 
+  nest(data = -a) %&gt;% 
+  sample_n(size = n_a / 2, weight = dnorm(a, mean = 7, sd = 1)) %&gt;% 
+  unnest(cols = data) %&gt;% 
+  anti_join(., ., by = c(&quot;b&quot; = &quot;a&quot;)) %&gt;% 
+  group_by(b) %&gt;% 
+  sample_n(size = 1, weight = dnorm(abs(t_l), mean = 10, sd = 2)) %&gt;% 
+  group_by(a) %&gt;% 
+  sample_n(size = 1, weight = dnorm(abs(t_l), mean = 10, sd = 2)) %&gt;% 
+  ungroup()
+
+df %&gt;% 
+  ggplot(aes(t_l)) +
+  geom_histogram()</code></pre>
+</div>
+<div id="step-showtime" class="section level1">
+<h1>Step %: Showtime</h1>
+<ul>
+<li><p>On a highway, moving vehicles tend to coalesce into clusters<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>. <strong><code>sift::kluster</code></strong> automatically identifies these natural groupings.</p></li>
+<li><p>One would expect to identify many vehicles with one timestamp in each direction (e.g. commuting to work). <strong><code>sift::spy</code></strong> provides visibility to this conjectural aspect of our dataset.</p></li>
+<li><p>What if we wanted to analyze how traffic density changes with Express lane prices? This would require inexact joining with another time-series dataset toll prices. <strong><code>sift::interlace</code></strong> performs this task in one step.</p></li>
+<li><p>Finally, we can use <strong><code>sift::sift</code></strong> to access chunks of rows surrounding points of interest.</p></li>
+</ul>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Although public service vehicles like metro buses utilize the Express Lane, we will exclude them here.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>That this doesn’t hold true during rush-hour is a moot point as traffic seldom approaches bumper-to-bumper in the Express Lane<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>

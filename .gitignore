@@ -5,7 +5,8 @@ Rproj.user
 sccm.Rproj
 /public/
 /blogdown/
-resources/
+/resources/
 .Rproj.user/
 .DS_Store
 Thumbs.db
+.Rprofile

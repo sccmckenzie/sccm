@@ -14,11 +14,15 @@ theme_set(theme_minimal())
 ```
 
 
-In this post I will explain how I simulated vehicle records for the [Texas Loop 1 (Mopac) Express Lane](https://www.mobilityauthority.com/traveler-info/open-roads/MoPac-Express).
+In this post I will explain how I simulated vehicle records for the [Mopac Express Lane](https://www.mobilityauthority.com/traveler-info/open-roads/MoPac-Express) in Austin, Texas.
 
-<!-- Final result goes here -->
+<!-- Photo goes here -->
 
-To showcase the functionality of my upcoming package, [sift](https://github.com/sccmckenzie/sift), I needed the **perfect** dataset - the idiosyncrasies of which will be discussed in a future post. Suffice to say, I felt inspired to concoct something from scratch.
+# Motivation 
+
+I am currently working towards the release of my second R package, [sift](https://github.com/sccmckenzie/sift). This package is essentially an amalgam of various ideas I've had over the past few years. Since grouping these ideas into one package was very important to me, I needed a common theme to tie all of the functions together.
+
+The dataset created in this post, **`express`**, serves as a realistic case study where one can effectively utilize the full capability of [sift](https://github.com/sccmckenzie/sift).
 
 # Step 1: Reconnaissance
 
@@ -26,35 +30,46 @@ How frequent are various vehicle types on Mopac? Lots of F-150s? Toyota Camrys?
 
 By no means does the intended application of the dataset require 100% accuracy. However, achieving something somewhat realistic was still important to me. After coming up dry on Google, I decided to walk out my front door and get the answer from the primary source.
 
-Discreetly nestled in a grove overlooking Mopac, I aimed my camera at rush hour traffic and let the shutter sing for 2.5 minutes. After repeating this over the course of 1 week, I had collected over 600 frames.
+Discreetly nestled in a grove overlooking Mopac, I aimed my camera at rush hour traffic and let the shutter snap for 2.5 minutes. After repeating this over the course of 1 week, I had collected over 600 frames.
 
-![](mopac-collage.png)
+<!-- Put collage here -->
 
-Yes, I was a little nervous that someone might mistake my benign endeavor for something more sinister - or worse, turn it into a TikTok sensation.
+Someday, these photos will serve as an excellent  a Machine Learning algorithm to automatically classify the photos. It took over 8 hours of data entry to transcribe all `r nrow(mopac::rush_hour)` observations.
 
-Perhaps someday I'll experiment with creating a Machine Learning algorithm to automatically classify these photos. It took over 8 hours to manually capture all `r nrow(mopac::rush_hour)` observations.
-
-### Raw Observations
+**I've named this dataset `rush_hour`.**
 
 ```{r message = FALSE}
 library(tidyverse)
 
-url <- "https://raw.githubusercontent.com/sccmckenzie/mopac/master/inst/extdata/rush_hour.csv"
-rush_hour <- read_csv(url, locale = locale(tz = "US/Central"))
+options(readr.default_locale = locale(tz = "US/Central"))
+
+rush_hour <- read_csv("https://raw.githubusercontent.com/sccmckenzie/mopac/master/inst/extdata/rush_hour.csv")
 # also available in mopac::rush_hour
 
 rush_hour %>% 
   sample_n(10)
 ```
 
+If you live in Texas, the below results shouldn't come as a surprise.
+
+```{r eval = FALSE}
+rush_hour %>% 
+  unite(make_model, make, model, sep = " ") %>% 
+  drop_na(make_model) %>% 
+  count(make_model) %>% 
+  slice_max(order_by = n, n = 10) %>% 
+  ggplot(aes(n, fct_reorder(make_model, n))) +
+  geom_col()
+```
+
+
 ```{r echo = FALSE, fig.height = 3}
 rush_hour %>% 
-  mutate(make_model = str_c(make, model, sep = " ")) %>% 
+  unite(make_model, make, model, sep = " ") %>% 
   drop_na(make_model) %>% 
-  count(make_model, sort = TRUE) %>% 
-  slice_head(n = 10) %>% 
-  mutate(make_model = fct_reorder(make_model, n)) %>% 
-  ggplot(aes(n, make_model)) +
+  count(make_model) %>% 
+  slice_max(order_by = n, n = 10) %>% 
+  ggplot(aes(n, fct_reorder(make_model, n))) +
   geom_col() +
   scale_x_continuous(expand = c(0, 0)) +
   theme(plot.title.position = "plot",
@@ -64,15 +79,20 @@ rush_hour %>%
   labs(title = "Most frequent make/models on Mopac", x = "frequency", y = NULL)
 ```
 
+Although **`rush_hour`** satisfies the need for realistic vehicle make/model frequencies, it cannot serve as a basis for inferring time-series traffic density in the express lane since the observations were obtained from the Mopac mainlanes.
 
+To avoid further speculation, I made another trip dedicated solely to acquiring express lane timestamps (collected during afternoon rush hour).
+
+```{r}
+express_counts <- read_csv("https://raw.githubusercontent.com/sccmckenzie/mopac/master/inst/extdata/express_counts.csv")
+```
 # Step 2: Defining Scope
 
 Mopac contains an express lane in both directions, stretching 11 miles from downtown Austin to Parmer Lane. Midway between these terminals, there is a checkpoint near Far West Blvd.
 
 * Our mock dataset, **`express`**, will feature vehicle descriptions + timestamps **as if they are captured at the Far West Blvd checkpoint.**
-* We'll obtain baseline traffic distribution by bootstrapping **`rush_hour`**, then adjusting based on City of Austin data.
-* Vehicle make/model/color frequencies will be inferred from **`rush_hour`**.
-* Although public service vehicles like metro buses utilize the Express Lane, we will exclude them here.
+* We'll obtain peak traffic distribution by bootstrapping **`express_counts`**, then adjusting based on City of Austin data.
+* Vehicle make/model/color frequencies will be inferred from **`rush_hour`**.[^1]
 
 # Step 3: Initial Traffic Distribution
 
@@ -81,14 +101,12 @@ library(lubridate)
 
 # obtain vehicle spacing from rush_hour
 set.seed(10)
-t_delta <- rush_hour %>%
-  with_groups(day,
-              mutate,
-              t_delta = time_length(time - lag(time))) %>%
+t_delta <- express_counts %>%
+  mutate(t_delta = time_length(time - lag(time))) %>%
   drop_na(t_delta) %>%
   # sprinkle some jitter into timestamps
   # (observations were recorded with 1 sec resolution - this needs to be finer)
-  mutate(t_delta = t_delta + 2 * rbeta(n(), 2, 5)) %>% 
+  mutate(t_delta = t_delta + 2 * rbeta(n(), 2, 3)) %>%
   pull(t_delta)
 
 head(t_delta)
@@ -121,9 +139,7 @@ express <- tibble(direction = c("North", "South")) %>%
   # add temporal vehicle spacing together
   # & cut off timestamps later than 8pm
   transmute(time = make_datetime(2020, 5, 20, t1, tz = "US/Central") + cumsum(vehicle_spacing)) %>% 
-  filter(time < make_datetime(2020, 5, 20, t2, tz = "US/Central")) %>% 
-  # express lane traffic density is much lower compared to mainlanes
-  sample_n(size = n() / 8)
+  filter(time < make_datetime(2020, 5, 20, t2, tz = "US/Central"))
   
 ```
 
@@ -134,17 +150,17 @@ express %>%
   summarize(volume = n()) %>% 
   ggplot(aes(t15, volume)) +
   geom_line(aes(color = direction), size = 1.5) +
-  scale_y_continuous(limits = c(0, 160)) +
+  scale_y_continuous(limits = c(0, 200)) +
   labs(title = "Simulated Traffic Volume at Mopac Express Lane (Far West)",
        subtitle = "Summed over 15 min intervals",
        x = NULL, y = NULL)
 ```
 
-The temporal uniformity shown above is unrealistic - we can do better.
+Throughout the entire day, the simulated traffic density stays roughly the same - this is unrealistic. For example, around 6:00am, almost nobody uses the express lane.
 
 # Step 4: Exploring City of Austin API
 
-Although Texas state highway mainlane traffic count data is elusive (at least at the granularity needed for this application), the City of Austin (COA) provides ample resources on frontage road intersections.
+Although Texas state highway traffic count data is elusive (at least at the granularity needed for this application), the City of Austin (COA) provides ample resources on frontage road intersections.
 
 Below we access Mopac & Steck Ave traffic volume measurements from COA open data portal. This intersection is located ~ 1.5mi north of Mopac & Far West, which unfortunately doesn't have records in the [Camera Traffic Counts](https://data.austintexas.gov/Transportation-and-Mobility/Camera-Traffic-Counts/sh59-i6y9) table.
 
@@ -236,7 +252,7 @@ express %>%
   summarize(volume = n()) %>% 
   ggplot(aes(t15, volume)) +
   geom_line(aes(color = direction), size = 1.5) +
-  scale_y_continuous(limits = c(0, 160)) +
+  scale_y_continuous(limits = c(0, 200)) +
   labs(title = "Simulated Traffic Volume at Mopac Express Lane (Far West)",
        subtitle = "Summed over 15 min intervals",
        x = NULL, y = NULL)
@@ -255,16 +271,16 @@ We are going to add 4 columns:
 * Model
 * Color
 
-We'll save generation of the above permutations for the very end. For now, we will denote unique vehicles by integer **`v_id`**. Adding row numbers will also save us some headache later.
+We'll save generation of the above permutations for the very end. For now, we will denote unique vehicles by integer **`v_id`**. 
 
 ```{r}
 express <- express %>% 
-  mutate(r_id = row_number(),
+  mutate(r_id = row_number(), # will save us headache later
          v_id = NA_integer_)
 ```
 
 
-Before we jump in, let's outline possible scenarios. Since we cannot rely on COA open data portal to estimate weighting, I've assigned them myself.
+Let's outline possible scenarios. Since we cannot rely on COA open data portal to estimate weighting, I've assigned them myself.
 
 * **A**: Vehicle uses Express Lane once **in both directions** (e.g. commuting to & from work) - 50%.
 * **B**: Vehicle uses Express Lane thrice **in any combination of directions** (e.g. rideshare) - 10%.
@@ -272,7 +288,7 @@ Before we jump in, let's outline possible scenarios. Since we cannot rely on COA
 
 The key challenge will be assigning *realistic* groups of timestamps to one vehicle. A simple call to `sample()` isn't going to cut it.
 
-```{r}
+```{r echo = FALSE, eval = FALSE}
 # Scenario A
 # Use both directions once
 # 50% of timestamps associated with this scenario
@@ -315,37 +331,56 @@ for (v_id in seq_len(n_a / 2)) {
 }
 ```
 
-```{r}
-express %>% 
-  filter(!is.na(v_id)) %>% 
-  group_by(v_id) %>% 
-  summarize(trip_length = time_length(max(time) - min(time), unit = "hours")) %>% 
-  ggplot(aes(trip_length)) +
-  geom_histogram()
-
-```
-```{r}
+```{r eval = FALSE}
 hourday <- function(t) {
   time_length(t - make_datetime(2020, 5, 20, tz = "US/Central"), unit = "hours")
 }
 
+n_a <- nrow(express) * 0.5 # this needs refinement
 
-df <- crossing(north = filter(express, direction == "North")$time, south = filter(express, direction == "South")$time)
+north <-   express %>% 
+  filter(direction == "North") %>% 
+  transmute(north = hourday(time))
 
-df <- df %>% 
-  mutate(across(where(is.POSIXct), hourday),
-         t_l = north - south,
-         t_n = dnorm(abs(t_l), mean = 9, sd = 1),
+south <- express %>% 
+  filter(direction == "South") %>% 
+  transmute(south = hourday(time))
+
+set.seed(40)
+df <- expand_grid(north, south) %>% 
+  mutate(t_l = north - south,
          a = if_else(t_l > 0, south, north),
-         b = if_else(t_l > 0, north, south)) %>% 
+         # a_id = if_else(t_l > 0, s_id, n_id),
+         b = if_else(t_l > 0, north, south),
+         # b_id = if_else(t_l > 0, n_id, s_id)
+         ) %>%  
   filter(t_l > 0.5) %>% 
   nest(data = -a) %>% 
   sample_n(size = n_a / 2, weight = dnorm(a, mean = 7, sd = 1)) %>% 
   unnest(cols = data) %>% 
-  anti_join(., ., by = c("b" = "a"))
+  anti_join(., ., by = c("b" = "a")) %>% 
+  group_by(b) %>% 
+  sample_n(size = 1, weight = dnorm(abs(t_l), mean = 10, sd = 2)) %>% 
+  group_by(a) %>% 
+  sample_n(size = 1, weight = dnorm(abs(t_l), mean = 10, sd = 2)) %>% 
+  ungroup()
 
-
-
+df %>% 
+  ggplot(aes(t_l)) +
+  geom_histogram()
 
 ```
 
+
+# Step %: Showtime
+
+* On a highway, moving vehicles tend to coalesce into clusters[^2]. **`sift::kluster`** automatically identifies these natural groupings.
+
+* One would expect to identify many vehicles with one timestamp in each direction (e.g. commuting to work). **`sift::spy`** provides visibility to this conjectural aspect of our dataset.
+
+* What if we wanted to analyze how traffic density changes with Express lane prices? This would require inexact joining with another time-series dataset toll prices. **`sift::interlace`** performs this task in one step.
+
+* Finally, we can use **`sift::sift`** to access chunks of rows surrounding points of interest.
+
+[^1]: Although public service vehicles like metro buses utilize the Express Lane, we will exclude them here.
+[^2]: That this doesn't hold true during rush-hour is a moot point as traffic seldom approaches bumper-to-bumper in the Express Lane
