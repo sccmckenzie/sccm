@@ -15,7 +15,7 @@ knitr::opts_chunk$set(message = FALSE)
 
 In this post, I explain how I simulated vehicle records for the [Mopac Express Lane](https://www.mobilityauthority.com/traveler-info/open-roads/MoPac-Express) in Austin, Texas.
 
-![](mopac-birds-eye.jpg)
+![](mopac-birds-eye.png)
 
 # Motivation 
 
