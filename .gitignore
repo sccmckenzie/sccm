@@ -2,12 +2,11 @@ Rproj.user
 .Rhistory
 .RData
 .Ruserdata
-.Rprofile
+sccm.Rproj
 /public/
 /blogdown/
 /resources/
 .Rproj.user/
 .DS_Store
 Thumbs.db
-sccm.Rproj
-old-site
+.Rprofile
