@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="{{.Language}}">
+{{ partial "meta" . }}
+<body>
+<img src="globe.svg" style="
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: 50%;
+    opacity: 25%;
+">
+<header class="container no-print">
+	<div class="u-header">
+		{{ partial "navbar" . }}
+	</div>
+</header>
+<main class="container">
+<article>
+	<header>
+		{{ partial "title" . }}
+		{{ with .Content }}{{.}}{{ end }}
+	</header>
+	{{ $latestcount := .Site.Params.LatestCount | default 3 }}
+	<section>
+		<h4>{{ T "latestPost" }}</h4>
+		<ul class="no-bullet">
+			{{ $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+			{{- range (first $latestcount $pages) -}}
+			{{ partial "li" . }}
+			{{- end -}}
+		</ul>
+	</section>
+
+	{{ $pages := where site.RegularPages "Type" "in" .Site.Params.WorkSections }}
+	{{ if ne (len $pages) 0 }}
+	<section>
+		<h4>{{ T "latestWork" }}</h4>
+		<ul class="no-bullet">
+			{{- range (first $latestcount $pages) -}}
+			{{ partial "li" . }}
+			{{- end -}}
+		</ul>
+	</section>
+	{{ end }}
+</article>
+{{ partial "footer" . }}

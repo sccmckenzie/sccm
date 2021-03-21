@@ -1,0 +1,619 @@
+---
+title: Crafting an Artificial Dataset
+author: Scott McKenzie
+date: '2021-03-20'
+slug: mopac-dataset
+tags:
+  - R
+editor_options: 
+  chunk_output_type: console
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>In this post, I explain how I simulated vehicle records for the <a href="https://www.mobilityauthority.com/traveler-info/open-roads/MoPac-Express">Mopac Express Lane</a> in Austin, Texas.</p>
+<p><img src="mopac-birds-eye.png" /></p>
+<div id="motivation" class="section level1">
+<h1>Motivation</h1>
+<p>I am currently working towards the release of my second R package, <a href="https://github.com/sccmckenzie/sift">sift</a>. This package is essentially an amalgam of various ideas I’ve had over the past few years. Since grouping these ideas into one package was very important to me, I needed a common theme to tie all of the functions together.</p>
+<p>The dataset created in this post, <strong><code>express</code></strong>, serves as a realistic case study where one can effectively utilize the full capability of <a href="https://github.com/sccmckenzie/sift">sift</a>.</p>
+<pre class="r"><code>library(tidyverse)
+library(lubridate)
+library(jsonlite)
+
+options(readr.default_locale = locale(tz = &quot;US/Central&quot;))
+theme_set(theme_minimal())</code></pre>
+</div>
+<div id="step-1-reconnaissance" class="section level1">
+<h1>Step 1: Reconnaissance</h1>
+<p>How frequent are various vehicle types on Mopac? Lots of F-150s? Toyota Camrys?</p>
+<p>By no means does the intended application of the dataset require 100% accuracy. However, achieving something somewhat realistic was still important to me. After coming up dry on Google, I decided to walk out my front door and get the answer from the primary source.</p>
+<p>Discreetly nestled in a grove overlooking Mopac, I aimed my camera at rush hour traffic and let the shutter snap for 2.5 minutes. After repeating this over the course of 1 week, I had collected over 600 frames.</p>
+<p><img src="mopac-collage.png" /></p>
+<p>These photos present a clear opportunity to apply an Image Recognition ML algorithm - but I’m saving that for a future post. 😉</p>
+<p>The resulting dataset is named <strong><code>rush_hour</code>.</strong></p>
+<pre class="r"><code>rush_hour &lt;- read_csv(&quot;https://raw.githubusercontent.com/sccmckenzie/mopac/master/inst/extdata/rush_hour.csv&quot;)
+# also available in mopac::rush_hour
+
+rush_hour %&gt;% 
+  sample_n(5) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">day</th>
+<th align="left">time</th>
+<th align="left">commercial</th>
+<th align="left">color</th>
+<th align="left">type</th>
+<th align="left">make</th>
+<th align="left">model</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Thu</td>
+<td align="left">2020-05-21 18:49:29</td>
+<td align="left">FALSE</td>
+<td align="left">Black</td>
+<td align="left">Sedan</td>
+<td align="left">Toyota</td>
+<td align="left">Camry</td>
+</tr>
+<tr class="even">
+<td align="left">Wed</td>
+<td align="left">2020-05-20 18:28:47</td>
+<td align="left">FALSE</td>
+<td align="left">White</td>
+<td align="left">Sedan</td>
+<td align="left">BMW</td>
+<td align="left">3-Series</td>
+</tr>
+<tr class="odd">
+<td align="left">Sat</td>
+<td align="left">2020-05-23 15:06:26</td>
+<td align="left">FALSE</td>
+<td align="left">White</td>
+<td align="left">SUV</td>
+<td align="left">Mercedes</td>
+<td align="left">GLK-Class</td>
+</tr>
+<tr class="even">
+<td align="left">Wed</td>
+<td align="left">2020-05-20 18:29:23</td>
+<td align="left">FALSE</td>
+<td align="left">Black</td>
+<td align="left">SUV</td>
+<td align="left">Ford</td>
+<td align="left">Expedition</td>
+</tr>
+<tr class="odd">
+<td align="left">Wed</td>
+<td align="left">2020-05-20 18:28:39</td>
+<td align="left">FALSE</td>
+<td align="left">White</td>
+<td align="left">Sedan</td>
+<td align="left">Mercedes</td>
+<td align="left">S-Class</td>
+</tr>
+</tbody>
+</table>
+<p>If you live in Texas, the below results shouldn’t come as a surprise.</p>
+<pre class="r"><code>rush_hour %&gt;% 
+  unite(make_model, make, model, sep = &quot; &quot;) %&gt;% 
+  drop_na(make_model) %&gt;% 
+  count(make_model) %&gt;% 
+  slice_max(order_by = n, n = 10) %&gt;% 
+  ggplot(aes(n, fct_reorder(make_model, n))) +
+  geom_col()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.svg" width="672" /></p>
+<p>Although <strong><code>rush_hour</code></strong> satisfies the need for realistic vehicle make/model frequencies, it cannot serve as a basis for inferring express lane traffic density since observations were obtained from Mopac mainlanes.</p>
+<p>To avoid further speculation, I made another trip to acquire express lane timestamps (collected during afternoon rush hour).</p>
+<pre class="r"><code>express_counts &lt;- read_csv(&quot;https://raw.githubusercontent.com/sccmckenzie/mopac/master/inst/extdata/express_counts.csv&quot;)
+
+glimpse(express_counts)</code></pre>
+<pre><code>## Rows: 250
+## Columns: 1
+## $ time &lt;dttm&gt; 2021-03-04 17:57:16, 2021-03-04 17:57:18, 2021-03-04 17:57:22, 2~</code></pre>
+</div>
+<div id="step-2-defining-scope" class="section level1">
+<h1>Step 2: Defining Scope</h1>
+<p>Mopac contains an express lane stretching 11 miles between downtown Austin to Parmer Lane. There is an intermediate access point near RM 2222, boxed in <span style="color: #ff00ff;">pink</span> below.</p>
+<div style="width: 396px; margin-left: auto; margin-right: auto;">
+<p><img src = "express-lane-map.png" /></p>
+</div>
+<ul>
+<li>Our mock dataset, <strong><code>express</code></strong>, will feature vehicle descriptions + timestamps <strong>as if they are captured at the RM 2222 checkpoint,</strong></li>
+<li>We’ll obtain peak traffic distribution by bootstrapping <strong><code>express_counts</code></strong>, then adjusting based on City of Austin data.</li>
+<li>Vehicle make/model/color frequencies will be inferred from <strong><code>rush_hour</code></strong>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></li>
+</ul>
+</div>
+<div id="step-3-traffic-distribution" class="section level1">
+<h1>Step 3: Traffic Distribution</h1>
+<p>First, we extract timestamp spacing from <strong><code>express_counts</code></strong>.</p>
+<pre class="r"><code>set.seed(10)
+t_delta &lt;- express_counts %&gt;%
+  mutate(t_delta = time_length(time - lag(time))) %&gt;%
+  drop_na(t_delta) %&gt;%
+  mutate(t_delta = t_delta + 2 * rbeta(n(), 2, 3)) %&gt;%
+  # ^ we add some jitter into timestamps
+  # (observations were recorded with 1 sec resolution)
+  pull(t_delta)
+
+t_delta %&gt;% 
+  qplot(binwidth = 0.25) # histogram</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.svg" width="672" /></p>
+<p>To simulate timestamps for <strong><code>express</code></strong>, we perform bootstrap sampling from the above distribution.</p>
+<pre class="r"><code># set timeframe (5am - 8pm)
+t1 &lt;- 5 
+t2 &lt;- 20
+total_seconds &lt;- (t2 - t1) * 3600
+
+set.seed(20)
+express &lt;- tibble(direction = c(&quot;North&quot;, &quot;South&quot;)) %&gt;%
+  rowwise(direction) %&gt;%
+  summarize(vehicle_spacing = sample(t_delta, size = total_seconds, replace = TRUE)) %&gt;%
+  # ^ generate temporal vehicle spacing
+  transmute(time = make_datetime(2020, 5, 20, t1, tz = &quot;US/Central&quot;) + cumsum(vehicle_spacing)) %&gt;% 
+    # ^ add temporal vehicle spacing together
+  filter(time &lt; make_datetime(2020, 5, 20, t2, tz = &quot;US/Central&quot;))
+# ^ cut off timestamps later than 8pm
+
+express %&gt;%
+  group_by(direction,
+           t15 = floor_date(time, unit = &quot;15 minutes&quot;)) %&gt;% 
+  summarize(volume = n()) %&gt;% 
+  ggplot(aes(t15, volume)) +
+  geom_line(aes(color = direction))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.svg" width="672" /></p>
+<p>While we have achieved some randomness, the consistent baseline around 150 is unrealistic. For example, around 6:00am, nobody is <em>actually</em> using the express lane.</p>
+<p>Luckily, I managed to find a table containing real traffic counts from the City of Austin Open Data Portal. The low-level details here aren’t super exciting - I’ve only included the code for the sake of reproducibility. Essentially, I am projecting the real traffic density profile onto the above baseline distribution.</p>
+<pre class="r"><code>steck &lt;- jsonlite::fromJSON(&#39;https://data.austintexas.gov/resource/sh59-i6y9.json?atd_device_id=6409&amp;year=2020&amp;month=5&amp;day=20&amp;heavy_vehicle=false&#39;) %&gt;% 
+  as_tibble() %&gt;% 
+  janitor::clean_names() %&gt;% 
+  filter(direction == &quot;SOUTHBOUND&quot;) %&gt;% 
+  transmute(read_date = as_datetime(read_date, tz = &quot;US/Central&quot;),
+            direction,
+            movement,
+            volume = as.integer(volume)) %&gt;% 
+  with_groups(read_date,
+              summarize,
+              volume = sum(volume)) %&gt;% 
+  transmute(id = row_number(),
+            read_date,
+            volume = volume/max(volume))
+
+# join Steck volume with express timestamps
+set.seed(25)
+express &lt;- express %&gt;% 
+  mutate(id = findInterval(time, steck$read_date)) %&gt;% 
+  left_join(steck, by = &quot;id&quot;) %&gt;% 
+  rowwise() %&gt;% 
+  mutate(keep = sample(c(FALSE, TRUE), prob = c(1 - volume, volume), size = 1)) %&gt;% 
+  # ^ treat volume as probability of keeping row in express
+  ungroup() %&gt;% 
+  filter(keep) %&gt;% 
+  select(direction, time) %&gt;% 
+  arrange_all()
+
+express %&gt;%
+  group_by(direction,
+           t15 = floor_date(time, unit = &quot;15 minutes&quot;)) %&gt;% 
+  summarize(volume = n()) %&gt;% 
+  ggplot(aes(t15, volume)) +
+  geom_line(aes(color = direction))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.svg" width="672" /></p>
+<p>Voila! The above distribution is much more believable: starting around 6am, traffic increases, levels out, and finally recedes around 6pm.</p>
+</div>
+<div id="step-4-trip-modeling" class="section level1">
+<h1>Step 4: Trip Modeling</h1>
+<p>We’ve arrived at the main course.</p>
+<p>Though we could arbitrarily assign a unique vehicle for each row in <strong><code>express</code></strong>, this wouldn’t be realistic. Consider the below scenarios:</p>
+<ol style="list-style-type: decimal">
+<li>Vehicle uses Express Lane once <strong>in one direction</strong>.</li>
+<li>Vehicle uses Express Lane once <strong>in both directions</strong> (e.g. commuting to &amp; from work).</li>
+<li>Vehicle uses Express Lane thrice <strong>in any combination of directions</strong> (e.g. rideshare).</li>
+</ol>
+<p>Before we jump in, let’s create a helper to extract hour of day as a decimal. This will improve readability of our downstream code.</p>
+<pre class="r"><code>hourday &lt;- function(t) {
+  time_length(t - make_datetime(2020, 5, 20, tz = &quot;US/Central&quot;), unit = &quot;hours&quot;)
+}
+
+# example
+hourday(as_datetime(&quot;2020-05-20 12:30:00&quot;, tz = &quot;US/Central&quot;))</code></pre>
+<pre><code>## [1] 12.5</code></pre>
+<p>For <strong>Scenario #1</strong>, each vehicle corresponds to one timestamp. We’ll obtain 5000 observations using a single unbiased sample.</p>
+<pre class="r"><code>set.seed(254)
+scenario_1 &lt;- express %&gt;% 
+  sample_n(size = 5000) %&gt;% 
+  mutate(v_id = row_number())
+
+scenario_1 %&gt;% 
+  ggplot(aes(time)) + 
+  geom_histogram(aes(fill = direction), binwidth = 900)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.svg" width="672" /></p>
+<p>Note the above distribution contains roughly the same amount of north &amp; south observations.</p>
+<p>For <strong>Scenario 2</strong>, we’ll need to enforce actual equality between directions so that each north timestamp has a corresponding south timestamp.</p>
+<p>Each vehicle will contain 2 timestamps:</p>
+<ul>
+<li>Timestamp A (driving to work)</li>
+<li>Timestamp B (driving home)</li>
+</ul>
+<p>We sample <strong>A</strong> Timestamps weighted by <span class="math inline">\(\mathcal{N}(7\textrm{am}, 4\textrm{hr})\)</span>.</p>
+<pre class="r"><code>set.seed(400)
+scenario_2A &lt;- express %&gt;% 
+  anti_join(scenario_1) %&gt;%
+  # ^ exclude observations already sampled into scenario_1
+  group_by(direction) %&gt;% 
+  # ^ need equal amounts of north &amp; south samples
+  sample_n(size = 1000, weight = dnorm(hourday(time), mean = 7, sd = 2)) %&gt;% 
+  mutate(id = row_number()) %&gt;% 
+  ungroup()</code></pre>
+<p>We’ll assume most trips take ~10 hours (9 hour workday + 30 minute commute each way). This implies a <strong>B</strong> timestamp distribution of <span class="math inline">\(\mathcal{N}(5\textrm{pm}, 4\textrm{hr})\)</span>.</p>
+<pre class="r"><code>scenario_2B &lt;- express %&gt;% 
+  anti_join(scenario_1) %&gt;%
+  anti_join(scenario_2A) %&gt;% 
+  group_by(direction) %&gt;% 
+  sample_n(size = 1000, weight = dnorm(hourday(time), mean = 17, sd = 2)) %&gt;% 
+  mutate(id = row_number()) %&gt;% 
+  ungroup()
+
+bind_rows(
+  mutate(scenario_2A, grp = &quot;A&quot;), 
+  mutate(scenario_2B, grp = &quot;B&quot;)
+  ) %&gt;% 
+  ggplot(aes(time)) +
+  geom_histogram(aes(fill = grp))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.svg" width="672" /></p>
+<p>Notice there is some overlap between the A &amp; B distribution. This is intentional, as there will inevitably be some drivers that start their commute in the afternoon.</p>
+<p>Currently, there are no unique vehicles tying observations together between <strong><code>scenario_2A</code></strong> &amp; <strong><code>scenario_2B</code></strong>. Timestamp pairing is deceptively challenging if we wish to avoid inefficient for-loop structures. After some trial-and-error, I found the below procedure to work quite nicely:</p>
+<ol style="list-style-type: decimal">
+<li>Randomly generate multiple sets - each containing 2500 pairs of observations (only pairing opposite directions together).</li>
+</ol>
+<pre class="r"><code># Example of one &#39;set&#39; for North -&gt; South
+# Within one set, each observation occurs once
+# North[i] is &#39;paired&#39; with South[i]
+set.seed(451)
+North &lt;- sample(filter(scenario_2A, direction == &quot;North&quot;)$time)
+South &lt;- sample(filter(scenario_2B, direction == &quot;South&quot;)$time)</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Eliminate sets that contain impossible pairs (e.g. negative trip length).</li>
+<li>Examine trip length distributions and select set that appears normal.</li>
+</ol>
+<p>The full implementation of this procedure is shown below.</p>
+<pre class="r"><code>set.seed(90)
+
+# I arbitrarily set the number of repetitions to 100,
+# which is ultimately more than enough to achieve desired result
+scenario_2_sim &lt;- bind_rows(
+  map_dfr(1:100, ~ {
+  tibble(i = ..1,
+         direction = &quot;NS&quot;,
+         North = filter(scenario_2A, direction == &quot;North&quot;)$time %&gt;% sample(),
+         South = filter(scenario_2B, direction == &quot;South&quot;)$time %&gt;% sample())
+  }),
+  # now we flip the directions
+  map_dfr(1:100, ~ {
+  tibble(i = ..1,
+         direction = &quot;SN&quot;,
+         South = filter(scenario_2A, direction == &quot;South&quot;)$time %&gt;% sample(),
+         North = filter(scenario_2B, direction == &quot;North&quot;)$time %&gt;% sample())
+  })
+) %&gt;% 
+  mutate(l = if_else(direction == &quot;NS&quot;,
+                     time_length(South - North, unit = &quot;hours&quot;),
+                     time_length(North - South, unit = &quot;hours&quot;))) %&gt;% 
+  with_groups(c(direction, i), filter, !any(l &lt; 0.5))
+
+  
+scenario_2_sim %&gt;% 
+  ggplot(aes(l)) +
+  geom_density(aes(color = factor(i))) +
+  facet_wrap(~ direction, ncol = 1)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.svg" width="672" /></p>
+<p>Most of these distributions appear normal. We’ll pick the one with the highest Shapiro-Wilk normality test statistic.</p>
+<pre class="r"><code>library(broom)
+
+scenario_2 &lt;- scenario_2_sim %&gt;% 
+  group_by(direction, i) %&gt;% 
+  summarize(vec = list(l)) %&gt;% 
+  rowwise() %&gt;% 
+  mutate(shapiro.test(vec) %&gt;% tidy()) %&gt;% 
+  filter(p.value &lt; 0.1) %&gt;% 
+  group_by(direction) %&gt;% 
+  slice_max(order_by = statistic) %&gt;% 
+  semi_join(scenario_2_sim, .) %&gt;% 
+  transmute(North, South, v_id = max(scenario_1$v_id) + row_number()) %&gt;% 
+  pivot_longer(North:South, names_to = &quot;direction&quot;, values_to = &quot;time&quot;)</code></pre>
+<p>For <strong>Scenario 3</strong>, we won’t impose any distributional or directional constraints on timestamp selection, simplifying the procedure considerably.</p>
+<p>Since the average driver is unlikely to use the express lane more than twice / day, we will assign 100 vehicles to Scenario 3.</p>
+<p>First, we shuffle the remaining rows in <strong><code>express</code></strong> and assign 3 timestamps per vehicle.</p>
+<pre class="r"><code>set.seed(100)
+
+scenario_3 &lt;- express %&gt;% 
+  anti_join(scenario_1) %&gt;% 
+  anti_join(scenario_2) %&gt;% 
+  sample_n(size = n()) %&gt;% 
+  mutate(v_id = (row_number() - 1) %% 3 == 0,
+         v_id = cumsum(v_id) + max(scenario_2$v_id)) %&gt;% 
+  arrange(v_id, time)
+
+scenario_3 %&gt;% 
+  slice_head(n = 9) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">direction</th>
+<th align="left">time</th>
+<th align="right">v_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">North</td>
+<td align="left">2020-05-20 11:19:17</td>
+<td align="right">7001</td>
+</tr>
+<tr class="even">
+<td align="left">South</td>
+<td align="left">2020-05-20 15:07:51</td>
+<td align="right">7001</td>
+</tr>
+<tr class="odd">
+<td align="left">South</td>
+<td align="left">2020-05-20 17:54:40</td>
+<td align="right">7001</td>
+</tr>
+<tr class="even">
+<td align="left">South</td>
+<td align="left">2020-05-20 08:47:28</td>
+<td align="right">7002</td>
+</tr>
+<tr class="odd">
+<td align="left">South</td>
+<td align="left">2020-05-20 13:21:30</td>
+<td align="right">7002</td>
+</tr>
+<tr class="even">
+<td align="left">South</td>
+<td align="left">2020-05-20 17:14:47</td>
+<td align="right">7002</td>
+</tr>
+<tr class="odd">
+<td align="left">South</td>
+<td align="left">2020-05-20 13:08:55</td>
+<td align="right">7003</td>
+</tr>
+<tr class="even">
+<td align="left">South</td>
+<td align="left">2020-05-20 13:24:35</td>
+<td align="right">7003</td>
+</tr>
+<tr class="odd">
+<td align="left">South</td>
+<td align="left">2020-05-20 17:55:40</td>
+<td align="right">7003</td>
+</tr>
+</tbody>
+</table>
+<p>All that remains is to exclude vehicles with unrealistic timestamps. This time, we’ll use a lower threshold of 1 hour.</p>
+<pre class="r"><code>scenario_3 &lt;- scenario_3 %&gt;%   
+  group_by(v_id) %&gt;% 
+  mutate(delta = time_length(time - lag(time), unit = &quot;hours&quot;)) %&gt;% 
+  filter(!any(delta &lt; 1, na.rm = TRUE)) %&gt;% 
+  ungroup() %&gt;% 
+  slice_head(n = 300) %&gt;% 
+  # ^ 3 rows / vehicle * 100 vehicles = 300 rows
+  select(direction, time, v_id)</code></pre>
+<p>There is also an Easter Egg I wish to plant: 2 vehicles that travel close together twice in one day. This is part of a fictional “bank robbery.”</p>
+<p>We’ll sample a pair of timestamps each from noon and 5:00pm (assuming the robbery takes place within that timeframe).</p>
+<pre class="r"><code>set.seed(99)
+
+robbery_A &lt;- express %&gt;% 
+  anti_join(scenario_1) %&gt;% 
+  anti_join(scenario_2) %&gt;% 
+  anti_join(scenario_3) %&gt;% 
+  sample_n(size = 2, weight = dnorm(hourday(time), mean = 12, sd = 0.1)) %&gt;% 
+  mutate(v_id = max(scenario_2$v_id) + row_number())
+
+robbery_B &lt;- express %&gt;% 
+  anti_join(scenario_1) %&gt;% 
+  anti_join(scenario_2) %&gt;% 
+  anti_join(scenario_3) %&gt;% 
+  sample_n(size = 2, weight = dnorm(hourday(time), mean = 17, sd = 0.1)) %&gt;% 
+  mutate(v_id = max(scenario_2$v_id) + row_number())
+
+robbery &lt;- bind_rows(robbery_A, robbery_B)</code></pre>
+<p>Finally, we’ll assign the remaining timestamps to Scenario 1.</p>
+<pre class="r"><code>express &lt;- express %&gt;%
+  anti_join(scenario_1) %&gt;% 
+  anti_join(scenario_2) %&gt;% 
+  anti_join(scenario_3) %&gt;% 
+  anti_join(robbery) %&gt;% 
+  mutate(v_id = max(robbery$v_id) + row_number()) %&gt;% 
+  bind_rows(scenario_1, scenario_2, scenario_3, robbery) %&gt;% 
+  arrange(direction, time)</code></pre>
+</div>
+<div id="step-5-makemodel-assignment" class="section level1">
+<h1>Step 5: Make/model assignment</h1>
+<p>We’ve successfully assigned a <strong><code>v_id</code></strong> to each timestamp - but <strong><code>v_id</code></strong> is only an integer. Now, we need to assign vehicle make/model/color to each <strong><code>v_id</code></strong>.</p>
+<p>It’s finally time to leverage <strong>`rush_hour``</strong> from Step 1.</p>
+<p>For simplicity, we’ll assume the true frqeuency for each make/model does not depend upon day of the week. Hence, we treat each day as an independent sample. The below code calculates the weight of each make/model within each sample, then averages the weights between samples.</p>
+<pre class="r"><code>vehicle_probs &lt;- rush_hour %&gt;% 
+  drop_na() %&gt;% 
+  count(day, make, model) %&gt;% 
+  group_by(day) %&gt;% 
+  mutate(wt = n / sum(n)) %&gt;% 
+  group_by(make, model) %&gt;% 
+  summarize(wt_mean = mean(wt), .groups = &quot;drop&quot;) %&gt;% 
+  mutate(wt = wt_mean / sum(wt_mean), .keep = &quot;unused&quot;)</code></pre>
+<p>For colors, we’ll sum across the entire dataset.</p>
+<pre class="r"><code>color_probs &lt;- rush_hour %&gt;%
+  drop_na() %&gt;%
+  count(make, model, color) %&gt;%
+  group_by(make, model) %&gt;%
+  mutate(wt = n / sum(n)) %&gt;%
+  ungroup()</code></pre>
+<p>We use <strong><code>sample_n</code></strong> to assign make/model/color in a vectorized fashion. Here, <strong><code>dplyr</code></strong> allows us to seamlessly change grouping as we progress through the operation.</p>
+<pre class="r"><code>set.seed(98)
+express &lt;- express %&gt;% 
+  distinct(v_id) %&gt;% 
+  # make/model
+  bind_cols(sample_n(vehicle_probs,
+                     size = nrow(.),
+                     weight = wt,
+                     replace = TRUE)) %&gt;% 
+  select(!wt) %&gt;% 
+  # color
+  full_join(color_probs) %&gt;% 
+  group_by(v_id) %&gt;% 
+  sample_n(size = 1, weight = wt) %&gt;% 
+  select(!(n:wt)) %&gt;% 
+  inner_join(express, .) # join it all back with express
+
+express %&gt;% 
+  sample_n(5) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">direction</th>
+<th align="left">time</th>
+<th align="right">v_id</th>
+<th align="left">make</th>
+<th align="left">model</th>
+<th align="left">color</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">North</td>
+<td align="left">2020-05-20 14:32:48</td>
+<td align="right">4834</td>
+<td align="left">Porsche</td>
+<td align="left">Panamera</td>
+<td align="left">Black</td>
+</tr>
+<tr class="even">
+<td align="left">North</td>
+<td align="left">2020-05-20 05:40:34</td>
+<td align="right">5939</td>
+<td align="left">Infiniti</td>
+<td align="left">G37</td>
+<td align="left">White</td>
+</tr>
+<tr class="odd">
+<td align="left">North</td>
+<td align="left">2020-05-20 18:20:32</td>
+<td align="right">8654</td>
+<td align="left">Chevy</td>
+<td align="left">Silverado</td>
+<td align="left">Black</td>
+</tr>
+<tr class="even">
+<td align="left">South</td>
+<td align="left">2020-05-20 15:15:13</td>
+<td align="right">1557</td>
+<td align="left">Nissan</td>
+<td align="left">350Z</td>
+<td align="left">Silver</td>
+</tr>
+<tr class="odd">
+<td align="left">North</td>
+<td align="left">2020-05-20 15:21:27</td>
+<td align="right">2718</td>
+<td align="left">Honda</td>
+<td align="left">S-3000</td>
+<td align="left">Silver</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="step-6-plate-assignment" class="section level1">
+<h1>Step 6: Plate Assignment</h1>
+<p>Investigating license plate statistics (e.g. from where are the most frequent out-of-state plates) is certainly worth investigating - but for now, I’m choosing to generate plates that solely adhere to Texas formatting: 3 characters + 4 numbers. Again, the tidyverse saves us from expensive for-loop operations.</p>
+<pre class="r"><code>set.seed(97)
+plate_letters &lt;- crossing(L1 = LETTERS, L2 = LETTERS, L3 = LETTERS) %&gt;%
+  mutate(st = str_c(L1, L2, L3, sep = &quot;&quot;)) %&gt;%
+  pull(st) %&gt;%
+  sample(., n_distinct(express$v_id), replace = TRUE)
+
+plate_numbers &lt;- 0:9999
+plate_numbers &lt;- str_pad(plate_numbers, side = &quot;left&quot;, pad = &quot;0&quot;, width = 4) %&gt;%
+  sample(., n_distinct(express$v_id), replace = TRUE)
+
+plates &lt;- str_c(plate_letters, plate_numbers, sep = &quot;-&quot;)</code></pre>
+<p>At last, <strong><code>plate</code></strong> replaces the role of <strong><code>v_id</code></strong>.</p>
+<pre class="r"><code>express &lt;- express %&gt;% 
+  distinct(v_id) %&gt;% 
+  mutate(plate = plates) %&gt;% 
+  inner_join(express, .) %&gt;% 
+  relocate(plate, .before = make) %&gt;% 
+  select(!v_id)
+
+express %&gt;% 
+  sample_n(5) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">direction</th>
+<th align="left">time</th>
+<th align="left">plate</th>
+<th align="left">make</th>
+<th align="left">model</th>
+<th align="left">color</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">North</td>
+<td align="left">2020-05-20 14:44:10</td>
+<td align="left">ZKV-1030</td>
+<td align="left">Subaru</td>
+<td align="left">BRZ</td>
+<td align="left">Grey</td>
+</tr>
+<tr class="even">
+<td align="left">South</td>
+<td align="left">2020-05-20 10:49:33</td>
+<td align="left">FNA-7147</td>
+<td align="left">Chevy</td>
+<td align="left">Camaro</td>
+<td align="left">Red</td>
+</tr>
+<tr class="odd">
+<td align="left">South</td>
+<td align="left">2020-05-20 11:37:16</td>
+<td align="left">SAB-6592</td>
+<td align="left">Hyundai</td>
+<td align="left">Santa Fe</td>
+<td align="left">Silver</td>
+</tr>
+<tr class="even">
+<td align="left">South</td>
+<td align="left">2020-05-20 14:59:38</td>
+<td align="left">RUY-4366</td>
+<td align="left">BMW</td>
+<td align="left">5-Series</td>
+<td align="left">Black</td>
+</tr>
+<tr class="odd">
+<td align="left">North</td>
+<td align="left">2020-05-20 12:44:53</td>
+<td align="left">VLJ-3169</td>
+<td align="left">Hyundai</td>
+<td align="left">Tucson</td>
+<td align="left">Grey</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Although public service vehicles like metro buses utilize the Express Lane, we will exclude them here.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
