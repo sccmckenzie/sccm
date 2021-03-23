@@ -1,0 +1,96 @@
+---
+title: FiveThirtyEight Hamster Puzzle
+author: Scott McKenzie
+date: '2020-08-23'
+slug: hamster
+tags:
+   - R
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>In this post, I attempt to answer the following puzzle from <a href="https://fivethirtyeight.com/features/can-you-corral-your-hamster/">FiveThirtyEight’s Riddler Classic</a>:</p>
+<p><em>Quarantined in your apartment, you decide to entertain yourself by building a large pen for your pet hamster. To create the pen, you have several vertical posts, around which you will wrap a sheet of fabric. The sheet is 1 meter long — meaning the perimeter of your pen can be at most 1 meter — and weighs 1 kilogram, while each post weighs k kilograms.</em></p>
+<p><em>Over the course of a typical day, your hamster gets bored and likes to change rooms in your apartment. That means you want your pen to be lightweight and easy to move between rooms. The total weight of the posts and the fabric you use should not exceed 1 kilogram.</em></p>
+<p><em>For example, if k = 0.2, then you could make an equilateral triangle with a perimeter of 0.4 meters (since 0.4 meters of the sheet would weigh 0.4 kilograms), or you could make a square with perimeter of 0.2 meters. However, you couldn’t make a pentagon, since the weight of five posts would already hit the maximum and leave no room for the sheet.</em></p>
+<p><em>You want to figure out the best shape in order to enclose the largest area possible. What’s the greatest value of k for which you should use four posts rather than three?</em></p>
+<p><em>Extra credit: For which values of k should you use five posts, six posts, seven posts, and so on?</em></p>
+<div id="solution" class="section level2">
+<h2>Solution</h2>
+<p>We will define the number of sides as <span class="math inline">\(n\)</span>.</p>
+<p>Since the goal is to maximize area, we should use as much sheet as possible. In other words, the weight of the pen will always equal <span class="math inline">\(1\)</span> kg. Mathematically, we define the length of one side, <span class="math inline">\(l\)</span>, as:</p>
+<p><span class="math display">\[l = (1 - n * k) / n\]</span></p>
+<p>For each integer value of <span class="math inline">\(n\)</span>, there exists a range of allowable values of <span class="math inline">\(k\)</span>. The maximum value (non-inclusive) is simply <span class="math inline">\(1 / n\)</span>. These are shown in Figure <a href="#fig:k-acceptable">1</a> below.</p>
+<div class="figure" style="text-align: center"><span id="fig:k-acceptable"></span>
+<img src="{{< blogdown/postref >}}index_files/figure-html/k-acceptable-1.svg" alt="Acceptable values of k based on weight restrictions" width="672" />
+<p class="caption">
+Figure 1: Acceptable values of k based on weight restrictions
+</p>
+</div>
+<p>Regardless of integer value of <span class="math inline">\(n\)</span>, the optimal shape will be a regular polygon - any deviation from this would result in less area. We define the area, <span class="math inline">\(A\)</span>, using the formula for a regular <span class="math inline">\(n\)</span>-sided polygon:</p>
+<p><span class="math display">\[ A = \frac{1}{4}nl^2\text{cot}\left(\frac{\pi}{n}\right) \]</span>
+Combining the equations for <span class="math inline">\(l\)</span> and <span class="math inline">\(A\)</span> results in another form of A in terms of <span class="math inline">\(k\)</span> and <span class="math inline">\(n\)</span>:</p>
+<p><span class="math display">\[ A(n,k) = (0.25n^{-1} - 0.5k + 0.25nk^2)\text{cot}\left(\frac{\pi}{n}\right) \]</span>
+Figure <a href="#fig:a-curves">2</a> shows that, for a given value of <span class="math inline">\(n\)</span>, the area follows a parabolic curve for varying <span class="math inline">\(k\)</span>. Here, only the acceptable values of <span class="math inline">\(k\)</span> shown in Figure <a href="#fig:k-acceptable">1</a> are used.</p>
+<pre class="r"><code>A_fn &lt;- function(n, k) {
+  (0.25*n^-1 - 0.5*k + 0.25 * n * k ^ 2) * cot(pi/n)
+}
+
+tibble(n = 3:7) %&gt;% 
+  mutate(data = map(n, ~ {
+    k_max &lt;- 1/.x
+    
+    tibble(k = seq(0.001, k_max, by = 0.001), 
+           A = A_fn(.x, k))
+  })) %&gt;% 
+  unnest(data) %&gt;% 
+  ggplot(aes(k, A, color = factor(n))) +
+  geom_line(aes(group = n), size = 1) +
+  scale_color_viridis_d(begin = 0.1, end = 0.8, name = &quot;n&quot;)</code></pre>
+<div class="figure" style="text-align: center"><span id="fig:a-curves"></span>
+<img src="{{< blogdown/postref >}}index_files/figure-html/a-curves-1.svg" alt="Hamster pen area for various values of $n$ and $k$" width="672" />
+<p class="caption">
+Figure 2: Hamster pen area for various values of <span class="math inline">\(n\)</span> and <span class="math inline">\(k\)</span>
+</p>
+</div>
+<p>Of particular importance: the <span class="math inline">\(n\text{th}\)</span> curve intersects the <span class="math inline">\(n\text{th} + 1\)</span> curve <em>once</em>. This means we can set the <span class="math inline">\(n\text{th}\)</span> and <span class="math inline">\(n\text{th} + 1\)</span> area expression equal and solve for <em>one</em> root (the lower root), providing us the value of <span class="math inline">\(k\)</span> at which point the maximum area <em>crosses over</em> from one contour to the next.</p>
+<p><span class="math display">\[A(n+1, k) = A(n, k)\]</span></p>
+<p>For starters, we can answer the initial question: <em>What’s the greatest value of k for which you should use four posts rather than three?</em></p>
+<p><span class="math display">\[A(4, k) = A(3, k)\]</span>
+The resulting algebra simplifies to the following quadratic:</p>
+<p><span class="math display">\[ \left(\frac{3\sqrt{3}}{4} - \frac{3}{4} + \frac{\sqrt{3}}{4}\right)k^2 + \left(\frac{1}{2} - \frac{\sqrt{3}}{2}\right)k + \frac{\sqrt{3}}{16} - \frac{1}{12} = 0 \]</span></p>
+<p><span class="math display">\[ k \approx \{0.09, 0.283\} \]</span></p>
+<p>Again, we drop the upper root since we are only focused on the left-hand side of the parabolas.</p>
+<p>The answer to this riddle is <span style="background: #0E9AA7; color: white;"><span class="math inline">\(\sim 0.0896\)</span>.</span></p>
+</div>
+<div id="extra-credit" class="section level2">
+<h2>Extra Credit</h2>
+<p>I will be interested to see if someone reaches an explicit mathematical expression for the generalized solution. I was only able to solve numerically using the below method:</p>
+<pre class="r"><code>roots &lt;- function(n) {
+  c &lt;- cot(pi/(n + 1)) / cot(pi/n)
+  (c/2 - 0.5 + c(-1, 1) * sqrt((0.5 - c/2)^2 - 4*(n*c/4 - n/4 + c/4)*(c/(4*n+4) - 1/(4*n)))) / (2*(n*c/4 - n/4 + c/4))
+}
+
+k_crossover &lt;- tibble(n = 3:10,
+                      k = map_dbl(n, ~ roots(.x)[1]))
+
+k_crossover</code></pre>
+<pre><code>## # A tibble: 8 x 2
+##       n       k
+##   &lt;int&gt;   &lt;dbl&gt;
+## 1     3 0.0896 
+## 2     4 0.0396 
+## 3     5 0.0210 
+## 4     6 0.0125 
+## 5     7 0.00806
+## 6     8 0.00549
+## 7     9 0.00392
+## 8    10 0.00289</code></pre>
+<div class="figure" style="text-align: center"><span id="fig:k-crossover-area"></span>
+<img src="{{< blogdown/postref >}}index_files/figure-html/k-crossover-area-1.svg" alt="Red points represent locations where it becomes more advantagous to switch to polygon with $n - 1$ sides (with increasing $k$)" width="672" />
+<p class="caption">
+Figure 3: Red points represent locations where it becomes more advantagous to switch to polygon with <span class="math inline">\(n - 1\)</span> sides (with increasing <span class="math inline">\(k\)</span>)
+</p>
+</div>
+</div>

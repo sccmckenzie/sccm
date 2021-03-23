@@ -1,0 +1,226 @@
+---
+title: Simple Reactable Timeline in R
+description: 'Extend reactable framework to accommodate simple Gantt chart'
+author: Scott McKenzie
+date: '2020-11-22'
+slug: reactable-timeline
+categories: []
+tags: 
+  - reactable
+  - R
+  - timeline
+---
+
+
+```{r libraries, echo = FALSE, include = FALSE}
+library(tidyverse)
+library(lubridate)
+library(reactable)
+library(htmltools)
+```
+
+
+```{r include = FALSE, echo = FALSE}
+store_records <- read_csv("https://raw.githubusercontent.com/sccmckenzie/reactable-timeline/master/customer_df.csv")
+
+convert_timestamps <- function(t1, t2) {
+  # extract timestamp range
+  t01 <- min(t1)
+  t02 <- max(t2)
+  
+  # normalize event timestamps within total range
+  left <- time_length(t1 - t01)/time_length(t02 - t01)
+  width <- time_length(t2 - t1)/time_length(t02 - t01)
+  
+  # splice values into list
+  out <- list()
+  
+  for (i in 1:length(left)) {
+    out[[i]] <- list(left[i], width[i])
+  }
+  
+  out
+}
+
+create_timeline_bar <- function(left = 0, width = "100%", fill = "#00bfc4") {
+  left <- scales::percent(left)
+  width <- scales::percent(width)
+  
+  bar <- div(style = list(
+    position = "absolute",
+    left = left,
+    background = fill,
+    width = width,
+    height = "140%")
+  )
+  
+  chart <- div(style = list(
+    flexGrow = 1,
+    position = "relative",
+    display = "flex",
+    alignItems = "center",
+    height = "100%"
+  ), 
+  bar)
+  
+  div(style = list(
+    height = "100%"
+  ), 
+  chart)
+}
+```
+
+In this post, I will demonstrate how to create the below timeline using [reactable](https://glin.github.io/reactable/).
+
+```{r echo = FALSE}
+df <- store_records %>% 
+  mutate(timestamps = convert_timestamps(enter, exit))
+
+reactable(df,
+          fullWidth = FALSE,
+          compact = TRUE,
+          bordered = TRUE,
+          columns = list(
+            customer = colDef(width = 80),
+            revenue = colDef(width = 90, format = colFormat(digits = 1)),
+            enter = colDef(width = 80),
+            exit = colDef(width = 80),
+            timestamps = colDef(
+              width = 155,
+              cell = function(value) {
+                create_timeline_bar(left = value[[1]], width = value[[2]])
+              }
+            )
+          )
+)
+```
+
+```{r echo = FALSE}
+br()
+```
+
+### Motivation
+
+I've wanted to create an interactive timeline for awhile. There are a lot of great R timeline packages out there, but none of them really fit my needs. 
+
+I'm a huge fan of the reactable package, mainly for its sleek look and customizability. As a result, I had already invested a lot of time integrating "reactables" into my reports. Rather than annihilating my work hitherto, I needed a solution to augment my existing reactables with a graphical timeline.
+
+**The beauty of this solution is that it preserves the tabular framework of reactable.**
+
+First, let's load the data.
+
+```{r message = FALSE}
+library(tidyverse)
+
+url <- "https://raw.githubusercontent.com/sccmckenzie/reactable-timeline/master/customer_df.csv"
+store_records <- read_csv(url)
+```
+
+This is a simple dataset that I created for demonstration. It contains store records of customer revenue for 2020-02-03.
+
+* customer: Unique customer ID
+* revenue: Total revenue from items purchased by customer
+* enter: Time when customer enters store
+* exit: Time when customer exits store
+
+```{r}
+store_records
+```
+
+Our goal is to project `enter` and `exit` into a "timeline column".
+
+### Step 1: Define time transform function
+
+`convert_timestamps` will take `enter` and `exit`, normalize, merge, then return as `list`.
+
+```{r}
+library(lubridate) # needed for time_length()
+
+convert_timestamps <- function(t1, t2) {
+  # extract timestamp range
+  t01 <- min(t1)
+  t02 <- max(t2)
+  
+  # normalize event timestamps within total range
+  left <- time_length(t1 - t01)/time_length(t02 - t01)
+  width <- time_length(t2 - t1)/time_length(t02 - t01)
+  
+  # splice values into list
+  out <- list()
+  
+  for (i in 1:length(left)) {
+    out[[i]] <- list(left[i], width[i])
+  }
+  
+  out
+}
+```
+
+Example:
+```{r}
+store_records %>% 
+  mutate(timestamps = convert_timestamps(enter, exit))
+```
+
+### Step 2: Define html helper
+
+`reactable()` will feed output from `convert_timestamps` into `create_timeline_bar`, producing our final output.
+
+```{r}
+library(htmltools) # needed for div()
+
+create_timeline_bar <- function(left = 0, width = "100%", fill = "#00bfc4") {
+  left <- scales::percent(left)
+  width <- scales::percent(width)
+  
+  bar <- div(style = list(
+    position = "absolute",
+    left = left,
+    background = fill,
+    width = width,
+    height = "140%")
+  )
+  
+  chart <- div(style = list(
+    flexGrow = 1,
+    position = "relative",
+    display = "flex",
+    alignItems = "center",
+    height = "100%"
+  ), 
+  bar)
+  
+  div(style = list(
+    height = "100%"
+  ), 
+  chart)
+}
+```
+
+### Final product
+
+```{r}
+library(reactable)
+
+store_records %>% 
+  mutate(timestamps = convert_timestamps(enter, exit)) %>% 
+  # ^ created in Step 1
+  reactable(fullWidth = FALSE,
+            compact = TRUE,
+            bordered = TRUE,
+            columns = list(
+              customer = colDef(width = 100),
+              revenue = colDef(width = 90, format = colFormat(digits = 1)),
+              enter = colDef(width = 110),
+              exit = colDef(width = 110),
+              timestamps = colDef(
+                width = 155,
+                cell = function(value) {
+                  create_timeline_bar(left = value[[1]], width = value[[2]])
+                  # ^ created in Step 2
+                }
+              )
+            )
+  )
+```
+

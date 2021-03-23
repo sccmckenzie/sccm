@@ -1,0 +1,158 @@
+---
+title: Simple Reactable Timeline in R
+description: 'Extend reactable framework to accommodate simple Gantt chart'
+author: Scott McKenzie
+date: '2020-11-22'
+slug: reactable-timeline
+categories: []
+tags: 
+  - reactable
+  - R
+  - timeline
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+<script src="{{< blogdown/postref >}}index_files/core-js/shim.min.js"></script>
+<script src="{{< blogdown/postref >}}index_files/react/react.min.js"></script>
+<script src="{{< blogdown/postref >}}index_files/react/react-dom.min.js"></script>
+<script src="{{< blogdown/postref >}}index_files/reactwidget/react-tools.js"></script>
+<script src="{{< blogdown/postref >}}index_files/htmlwidgets/htmlwidgets.js"></script>
+<script src="{{< blogdown/postref >}}index_files/reactable-binding/reactable.js"></script>
+
+
+<p>In this post, I will demonstrate how to create the below timeline using <a href="https://glin.github.io/reactable/">reactable</a>.</p>
+<div id="htmlwidget-1" class="reactable html-widget" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"customer":[1,2,3,4,5,6,7,8,9,10],"revenue":[34.1949236220095,40.911096618683,0,26.0023818406626,11.1035160877699,44.2317942532748,29.0919315766478,33.3572045145147,0,25.0972797620078],"enter":["09:45:00","14:22:00","14:57:00","17:33:00","17:56:00","11:15:00","14:55:00","09:26:00","12:50:00","12:58:00"],"exit":["10:11:00","14:35:00","15:38:00","18:57:00","19:11:00","12:30:00","15:43:00","10:44:00","12:57:00","13:43:00"],"timestamps":[[[0.0324786324786325],[0.0444444444444444]],[[0.505982905982906],[0.0222222222222222]],[[0.565811965811966],[0.0700854700854701]],[[0.832478632478633],[0.143589743589744]],[[0.871794871794872],[0.128205128205128]],[[0.186324786324786],[0.128205128205128]],[[0.562393162393162],[0.0820512820512821]],[[0],[0.133333333333333]],[[0.348717948717949],[0.011965811965812]],[[0.362393162393162],[0.0769230769230769]]]},"columns":[{"accessor":"customer","name":"customer","type":"numeric","width":80},{"accessor":"revenue","name":"revenue","type":"numeric","format":{"cell":{"digits":1},"aggregated":{"digits":1}},"width":90},{"accessor":"enter","name":"enter","type":["hms","difftime"],"width":80},{"accessor":"exit","name":"exit","type":["hms","difftime"],"width":80},{"accessor":"timestamps","name":"timestamps","type":"list","cell":[{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"3%","background":"#00bfc4","width":"4%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"51%","background":"#00bfc4","width":"2%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"57%","background":"#00bfc4","width":"7%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"83%","background":"#00bfc4","width":"14%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"87%","background":"#00bfc4","width":"13%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"19%","background":"#00bfc4","width":"13%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"56%","background":"#00bfc4","width":"8%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"0%","background":"#00bfc4","width":"13%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"35%","background":"#00bfc4","width":"1%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"36%","background":"#00bfc4","width":"8%","height":"140%"}},"children":[]}]}]}],"width":155}],"defaultPageSize":10,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"compact":true,"inline":true,"dataKey":"7a0c236ec96bb45e2f35b3a6909e76ae","key":"7a0c236ec96bb45e2f35b3a6909e76ae"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+<p><br/></p>
+<div id="motivation" class="section level3">
+<h3>Motivation</h3>
+<p>I’ve wanted to create an interactive timeline for awhile. There are a lot of great R timeline packages out there, but none of them really fit my needs.</p>
+<p>I’m a huge fan of the reactable package, mainly for its sleek look and customizability. As a result, I had already invested a lot of time integrating “reactables” into my reports. Rather than annihilating my work hitherto, I needed a solution to augment my existing reactables with a graphical timeline.</p>
+<p><strong>The beauty of this solution is that it preserves the tabular framework of reactable.</strong></p>
+<p>First, let’s load the data.</p>
+<pre class="r"><code>library(tidyverse)
+
+url &lt;- &quot;https://raw.githubusercontent.com/sccmckenzie/reactable-timeline/master/customer_df.csv&quot;
+store_records &lt;- read_csv(url)</code></pre>
+<p>This is a simple dataset that I created for demonstration. It contains store records of customer revenue for 2020-02-03.</p>
+<ul>
+<li>customer: Unique customer ID</li>
+<li>revenue: Total revenue from items purchased by customer</li>
+<li>enter: Time when customer enters store</li>
+<li>exit: Time when customer exits store</li>
+</ul>
+<pre class="r"><code>store_records</code></pre>
+<pre><code>## # A tibble: 10 x 4
+##    customer revenue enter  exit  
+##       &lt;dbl&gt;   &lt;dbl&gt; &lt;time&gt; &lt;time&gt;
+##  1        1    34.2 09:45  10:11 
+##  2        2    40.9 14:22  14:35 
+##  3        3     0   14:57  15:38 
+##  4        4    26.0 17:33  18:57 
+##  5        5    11.1 17:56  19:11 
+##  6        6    44.2 11:15  12:30 
+##  7        7    29.1 14:55  15:43 
+##  8        8    33.4 09:26  10:44 
+##  9        9     0   12:50  12:57 
+## 10       10    25.1 12:58  13:43</code></pre>
+<p>Our goal is to project <code>enter</code> and <code>exit</code> into a “timeline column”.</p>
+</div>
+<div id="step-1-define-time-transform-function" class="section level3">
+<h3>Step 1: Define time transform function</h3>
+<p><code>convert_timestamps</code> will take <code>enter</code> and <code>exit</code>, normalize, merge, then return as <code>list</code>.</p>
+<pre class="r"><code>library(lubridate) # needed for time_length()
+
+convert_timestamps &lt;- function(t1, t2) {
+  # extract timestamp range
+  t01 &lt;- min(t1)
+  t02 &lt;- max(t2)
+  
+  # normalize event timestamps within total range
+  left &lt;- time_length(t1 - t01)/time_length(t02 - t01)
+  width &lt;- time_length(t2 - t1)/time_length(t02 - t01)
+  
+  # splice values into list
+  out &lt;- list()
+  
+  for (i in 1:length(left)) {
+    out[[i]] &lt;- list(left[i], width[i])
+  }
+  
+  out
+}</code></pre>
+<p>Example:</p>
+<pre class="r"><code>store_records %&gt;% 
+  mutate(timestamps = convert_timestamps(enter, exit))</code></pre>
+<pre><code>## # A tibble: 10 x 5
+##    customer revenue enter  exit   timestamps
+##       &lt;dbl&gt;   &lt;dbl&gt; &lt;time&gt; &lt;time&gt; &lt;list&gt;    
+##  1        1    34.2 09:45  10:11  &lt;list [2]&gt;
+##  2        2    40.9 14:22  14:35  &lt;list [2]&gt;
+##  3        3     0   14:57  15:38  &lt;list [2]&gt;
+##  4        4    26.0 17:33  18:57  &lt;list [2]&gt;
+##  5        5    11.1 17:56  19:11  &lt;list [2]&gt;
+##  6        6    44.2 11:15  12:30  &lt;list [2]&gt;
+##  7        7    29.1 14:55  15:43  &lt;list [2]&gt;
+##  8        8    33.4 09:26  10:44  &lt;list [2]&gt;
+##  9        9     0   12:50  12:57  &lt;list [2]&gt;
+## 10       10    25.1 12:58  13:43  &lt;list [2]&gt;</code></pre>
+</div>
+<div id="step-2-define-html-helper" class="section level3">
+<h3>Step 2: Define html helper</h3>
+<p><code>reactable()</code> will feed output from <code>convert_timestamps</code> into <code>create_timeline_bar</code>, producing our final output.</p>
+<pre class="r"><code>library(htmltools) # needed for div()
+
+create_timeline_bar &lt;- function(left = 0, width = &quot;100%&quot;, fill = &quot;#00bfc4&quot;) {
+  left &lt;- scales::percent(left)
+  width &lt;- scales::percent(width)
+  
+  bar &lt;- div(style = list(
+    position = &quot;absolute&quot;,
+    left = left,
+    background = fill,
+    width = width,
+    height = &quot;140%&quot;)
+  )
+  
+  chart &lt;- div(style = list(
+    flexGrow = 1,
+    position = &quot;relative&quot;,
+    display = &quot;flex&quot;,
+    alignItems = &quot;center&quot;,
+    height = &quot;100%&quot;
+  ), 
+  bar)
+  
+  div(style = list(
+    height = &quot;100%&quot;
+  ), 
+  chart)
+}</code></pre>
+</div>
+<div id="final-product" class="section level3">
+<h3>Final product</h3>
+<pre class="r"><code>library(reactable)
+
+store_records %&gt;% 
+  mutate(timestamps = convert_timestamps(enter, exit)) %&gt;% 
+  # ^ created in Step 1
+  reactable(fullWidth = FALSE,
+            compact = TRUE,
+            bordered = TRUE,
+            columns = list(
+              customer = colDef(width = 100),
+              revenue = colDef(width = 90, format = colFormat(digits = 1)),
+              enter = colDef(width = 110),
+              exit = colDef(width = 110),
+              timestamps = colDef(
+                width = 155,
+                cell = function(value) {
+                  create_timeline_bar(left = value[[1]], width = value[[2]])
+                  # ^ created in Step 2
+                }
+              )
+            )
+  )</code></pre>
+<div id="htmlwidget-2" class="reactable html-widget" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-2">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"customer":[1,2,3,4,5,6,7,8,9,10],"revenue":[34.1949236220095,40.911096618683,0,26.0023818406626,11.1035160877699,44.2317942532748,29.0919315766478,33.3572045145147,0,25.0972797620078],"enter":["09:45:00","14:22:00","14:57:00","17:33:00","17:56:00","11:15:00","14:55:00","09:26:00","12:50:00","12:58:00"],"exit":["10:11:00","14:35:00","15:38:00","18:57:00","19:11:00","12:30:00","15:43:00","10:44:00","12:57:00","13:43:00"],"timestamps":[[[0.0324786324786325],[0.0444444444444444]],[[0.505982905982906],[0.0222222222222222]],[[0.565811965811966],[0.0700854700854701]],[[0.832478632478633],[0.143589743589744]],[[0.871794871794872],[0.128205128205128]],[[0.186324786324786],[0.128205128205128]],[[0.562393162393162],[0.0820512820512821]],[[0],[0.133333333333333]],[[0.348717948717949],[0.011965811965812]],[[0.362393162393162],[0.0769230769230769]]]},"columns":[{"accessor":"customer","name":"customer","type":"numeric","width":100},{"accessor":"revenue","name":"revenue","type":"numeric","format":{"cell":{"digits":1},"aggregated":{"digits":1}},"width":90},{"accessor":"enter","name":"enter","type":["hms","difftime"],"width":110},{"accessor":"exit","name":"exit","type":["hms","difftime"],"width":110},{"accessor":"timestamps","name":"timestamps","type":"list","cell":[{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"3%","background":"#00bfc4","width":"4%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"51%","background":"#00bfc4","width":"2%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"57%","background":"#00bfc4","width":"7%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"83%","background":"#00bfc4","width":"14%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"87%","background":"#00bfc4","width":"13%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"19%","background":"#00bfc4","width":"13%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"56%","background":"#00bfc4","width":"8%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"0%","background":"#00bfc4","width":"13%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"35%","background":"#00bfc4","width":"1%","height":"140%"}},"children":[]}]}]},{"name":"div","attribs":{"style":{"height":"100%"}},"children":[{"name":"div","attribs":{"style":{"flexGrow":1,"position":"relative","display":"flex","alignItems":"center","height":"100%"}},"children":[{"name":"div","attribs":{"style":{"position":"absolute","left":"36%","background":"#00bfc4","width":"8%","height":"140%"}},"children":[]}]}]}],"width":155}],"defaultPageSize":10,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"compact":true,"inline":true,"dataKey":"05e3adb66dfb5f468063c4f47cd00627","key":"05e3adb66dfb5f468063c4f47cd00627"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+</div>

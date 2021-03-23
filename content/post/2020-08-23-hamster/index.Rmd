@@ -1,0 +1,130 @@
+---
+title: FiveThirtyEight Hamster Puzzle
+author: Scott McKenzie
+date: '2020-08-23'
+slug: hamster
+tags:
+   - R
+---
+```{r include = FALSE, message = FALSE}
+library(tidyverse)
+
+theme_set(theme_minimal())
+cot <- function(x) 1/tan(x)
+roots <- function(n) {
+  c <- cot(pi/(n + 1)) / cot(pi/n)
+  (c/2 - 0.5 + c(-1, 1) * sqrt((0.5 - c/2)^2 - 4*(n*c/4 - n/4 + c/4)*(c/(4*n+4) - 1/(4*n)))) / (2*(n*c/4 - n/4 + c/4))
+}
+
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, dev = "svglite")
+```
+
+
+In this post, I attempt to answer the following puzzle from [FiveThirtyEight's Riddler Classic](https://fivethirtyeight.com/features/can-you-corral-your-hamster/):
+
+*Quarantined in your apartment, you decide to entertain yourself by building a large pen for your pet hamster. To create the pen, you have several vertical posts, around which you will wrap a sheet of fabric. The sheet is 1 meter long — meaning the perimeter of your pen can be at most 1 meter — and weighs 1 kilogram, while each post weighs k kilograms.*
+
+*Over the course of a typical day, your hamster gets bored and likes to change rooms in your apartment. That means you want your pen to be lightweight and easy to move between rooms. The total weight of the posts and the fabric you use should not exceed 1 kilogram.*
+
+*For example, if k = 0.2, then you could make an equilateral triangle with a perimeter of 0.4 meters (since 0.4 meters of the sheet would weigh 0.4 kilograms), or you could make a square with perimeter of 0.2 meters. However, you couldn’t make a pentagon, since the weight of five posts would already hit the maximum and leave no room for the sheet.*
+
+*You want to figure out the best shape in order to enclose the largest area possible. What’s the greatest value of k for which you should use four posts rather than three?*
+
+*Extra credit: For which values of k should you use five posts, six posts, seven posts, and so on?*
+
+## Solution
+
+We will define the number of sides as $n$.
+
+Since the goal is to maximize area, we should use as much sheet as possible. In other words, the weight of the pen will always equal $1$ kg. Mathematically, we define the length of one side, $l$, as:
+
+$$l = (1 - n * k) / n$$
+
+For each integer value of $n$, there exists a range of allowable values of $k$. The maximum value (non-inclusive) is simply $1 / n$. These are shown in Figure \@ref(fig:k-acceptable) below.
+
+```{r k-acceptable, echo = FALSE, message = FALSE,  fig.cap = "Acceptable values of k based on weight restrictions", fig.align="center"}
+tibble(n = 3:10) %>% 
+  mutate(k_max = 1/n) %>% 
+  ggplot() +
+  geom_segment(aes(x = n, xend = n, y = 0, yend = k_max)) +
+  scale_x_continuous(breaks = 3:10) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme(panel.grid.minor = element_blank(),
+        plot.title.position = "plot") +
+  labs(title = "Acceptable values of k for varying n", y = "")
+```
+
+
+Regardless of integer value of $n$, the optimal shape will be a regular polygon - any deviation from this would result in less area. We define the area, $A$, using the formula for a regular $n$-sided polygon:
+
+$$ A = \frac{1}{4}nl^2\text{cot}\left(\frac{\pi}{n}\right) $$
+Combining the equations for $l$ and $A$ results in another form of A in terms of $k$ and $n$:
+
+$$ A(n,k) = (0.25n^{-1} - 0.5k + 0.25nk^2)\text{cot}\left(\frac{\pi}{n}\right) $$
+Figure \@ref(fig:a-curves) shows that, for a given value of $n$, the area follows a parabolic curve for varying $k$. Here, only the acceptable values of $k$ shown in Figure \@ref(fig:k-acceptable) are used.
+
+```{r a-curves, fig.cap = "Hamster pen area for various values of $n$ and $k$", fig.align="center"}
+A_fn <- function(n, k) {
+  (0.25*n^-1 - 0.5*k + 0.25 * n * k ^ 2) * cot(pi/n)
+}
+
+tibble(n = 3:7) %>% 
+  mutate(data = map(n, ~ {
+    k_max <- 1/.x
+    
+    tibble(k = seq(0.001, k_max, by = 0.001), 
+           A = A_fn(.x, k))
+  })) %>% 
+  unnest(data) %>% 
+  ggplot(aes(k, A, color = factor(n))) +
+  geom_line(aes(group = n), size = 1) +
+  scale_color_viridis_d(begin = 0.1, end = 0.8, name = "n")
+```
+ 
+Of particular importance: the $n\text{th}$ curve intersects the $n\text{th} + 1$ curve *once*. This means we can set the $n\text{th}$ and $n\text{th} + 1$ area expression equal and solve for *one* root (the lower root), providing us the value of $k$ at which point the maximum area *crosses over* from one contour to the next.
+
+$$A(n+1, k) = A(n, k)$$
+
+For starters, we can answer the initial question: *What’s the greatest value of k for which you should use four posts rather than three?*
+
+$$A(4, k) = A(3, k)$$
+The resulting algebra simplifies to the following quadratic:
+
+$$ \left(\frac{3\sqrt{3}}{4} - \frac{3}{4} + \frac{\sqrt{3}}{4}\right)k^2 + \left(\frac{1}{2} - \frac{\sqrt{3}}{2}\right)k + \frac{\sqrt{3}}{16} - \frac{1}{12} = 0 $$
+
+$$ k \approx \{`r paste0(round(roots(3), 3), collapse = ", ")`\} $$
+
+Again, we drop the upper root since we are only focused on the left-hand side of the parabolas.
+
+The answer to this riddle is <span style = "background: #0E9AA7; color: white;">$\sim `r round(roots(3)[1], 4)`$.</span>
+
+## Extra Credit
+
+I will be interested to see if someone reaches an explicit mathematical expression for the generalized solution. I was only able to solve numerically using the below method:
+
+```{r}
+roots <- function(n) {
+  c <- cot(pi/(n + 1)) / cot(pi/n)
+  (c/2 - 0.5 + c(-1, 1) * sqrt((0.5 - c/2)^2 - 4*(n*c/4 - n/4 + c/4)*(c/(4*n+4) - 1/(4*n)))) / (2*(n*c/4 - n/4 + c/4))
+}
+
+k_crossover <- tibble(n = 3:10,
+                      k = map_dbl(n, ~ roots(.x)[1]))
+
+k_crossover
+```
+
+```{r k-crossover-area, echo = FALSE, fig.cap = "Red points represent locations where it becomes more advantagous to switch to polygon with $n - 1$ sides (with increasing $k$)", fig.align="center"}
+tibble(n = 3:7) %>% 
+  mutate(data = map(n, ~ {
+    k_max <- 1/.x
+    
+    tibble(k = seq(0.001, k_max, by = 0.001), 
+           A = A_fn(.x, k))
+  })) %>% 
+  unnest(data) %>% 
+  ggplot(aes(k, A, color = factor(n))) +
+  geom_line(aes(group = n), size = 1) +
+  geom_point(color = "#E84A5F", size = 3, data = filter(k_crossover, n %in% 3:7) %>% rowwise() %>% mutate(A = A_fn(n, k))) +
+  scale_color_viridis_d(begin = 0.1, end = 0.8, name = "n")
+```
