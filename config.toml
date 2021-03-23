@@ -33,7 +33,7 @@ tag = "tags"
 # If false, use minified CSS (ui.min.css)
 debugCSS = false
 # Custom CSS
-customCSS = []
+customCSS = ["/reactable.css"]
 
 # Site meta description
 description = "Data Analyst Blog."
@@ -68,7 +68,7 @@ colorTheme = "#ff830c"
 # Maximum number of item in Latest Posts or Works
 latestCount = 3
 # Path to site's favicon image
-faviconImg = "globe.svg"
+faviconImg = "/globe.svg"
 # Date format in item list
 dateFmt = "Jan 02, 2006"
 

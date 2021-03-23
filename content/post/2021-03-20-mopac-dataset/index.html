@@ -37,68 +37,426 @@ theme_set(theme_minimal())</code></pre>
 # also available in mopac::rush_hour
 
 rush_hour %&gt;% 
-  sample_n(5) %&gt;% 
-  knitr::kable()</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="left">day</th>
-<th align="left">time</th>
-<th align="left">commercial</th>
-<th align="left">color</th>
-<th align="left">type</th>
-<th align="left">make</th>
-<th align="left">model</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Thu</td>
-<td align="left">2020-05-21 18:49:29</td>
-<td align="left">FALSE</td>
-<td align="left">Black</td>
-<td align="left">Sedan</td>
-<td align="left">Toyota</td>
-<td align="left">Camry</td>
-</tr>
-<tr class="even">
-<td align="left">Wed</td>
-<td align="left">2020-05-20 18:28:47</td>
-<td align="left">FALSE</td>
-<td align="left">White</td>
-<td align="left">Sedan</td>
-<td align="left">BMW</td>
-<td align="left">3-Series</td>
-</tr>
-<tr class="odd">
-<td align="left">Sat</td>
-<td align="left">2020-05-23 15:06:26</td>
-<td align="left">FALSE</td>
-<td align="left">White</td>
-<td align="left">SUV</td>
-<td align="left">Mercedes</td>
-<td align="left">GLK-Class</td>
-</tr>
-<tr class="even">
-<td align="left">Wed</td>
-<td align="left">2020-05-20 18:29:23</td>
-<td align="left">FALSE</td>
-<td align="left">Black</td>
-<td align="left">SUV</td>
-<td align="left">Ford</td>
-<td align="left">Expedition</td>
-</tr>
-<tr class="odd">
-<td align="left">Wed</td>
-<td align="left">2020-05-20 18:28:39</td>
-<td align="left">FALSE</td>
-<td align="left">White</td>
-<td align="left">Sedan</td>
-<td align="left">Mercedes</td>
-<td align="left">S-Class</td>
-</tr>
-</tbody>
-</table>
+  sample_n(5)</code></pre>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#kmgrhwqoch .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#kmgrhwqoch .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kmgrhwqoch .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#kmgrhwqoch .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#kmgrhwqoch .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kmgrhwqoch .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kmgrhwqoch .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#kmgrhwqoch .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#kmgrhwqoch .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#kmgrhwqoch .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#kmgrhwqoch .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#kmgrhwqoch .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#kmgrhwqoch .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#kmgrhwqoch .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#kmgrhwqoch .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#kmgrhwqoch .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#kmgrhwqoch .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#kmgrhwqoch .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kmgrhwqoch .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#kmgrhwqoch .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kmgrhwqoch .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#kmgrhwqoch .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#kmgrhwqoch .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kmgrhwqoch .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kmgrhwqoch .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#kmgrhwqoch .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kmgrhwqoch .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#kmgrhwqoch .gt_left {
+  text-align: left;
+}
+
+#kmgrhwqoch .gt_center {
+  text-align: center;
+}
+
+#kmgrhwqoch .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#kmgrhwqoch .gt_font_normal {
+  font-weight: normal;
+}
+
+#kmgrhwqoch .gt_font_bold {
+  font-weight: bold;
+}
+
+#kmgrhwqoch .gt_font_italic {
+  font-style: italic;
+}
+
+#kmgrhwqoch .gt_super {
+  font-size: 65%;
+}
+
+#kmgrhwqoch .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="kmgrhwqoch" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+  <thead class="gt_header">
+    <tr>
+      <th colspan="7" class="gt_heading gt_title gt_font_normal" style>rush_hour</th>
+    </tr>
+    <tr>
+      <th colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style></th>
+    </tr>
+  </thead>
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">day</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">time<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">commercial</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">color</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">type</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">make</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">model</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr>
+      <td class="gt_row gt_left">Mon</td>
+      <td class="gt_row gt_center">18:25:22</td>
+      <td class="gt_row gt_center">FALSE</td>
+      <td class="gt_row gt_left">Silver</td>
+      <td class="gt_row gt_left">Sedan</td>
+      <td class="gt_row gt_left">Chevy</td>
+      <td class="gt_row gt_left">Malibu</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">Thu</td>
+      <td class="gt_row gt_center">18:49:29</td>
+      <td class="gt_row gt_center">FALSE</td>
+      <td class="gt_row gt_left">Grey</td>
+      <td class="gt_row gt_left">Truck</td>
+      <td class="gt_row gt_left">Toyota</td>
+      <td class="gt_row gt_left">Tundra</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">Fri</td>
+      <td class="gt_row gt_center">18:46:40</td>
+      <td class="gt_row gt_center">FALSE</td>
+      <td class="gt_row gt_left">White</td>
+      <td class="gt_row gt_left">Sedan</td>
+      <td class="gt_row gt_left">Mazda</td>
+      <td class="gt_row gt_left">3</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">Mon</td>
+      <td class="gt_row gt_center">18:24:54</td>
+      <td class="gt_row gt_center">FALSE</td>
+      <td class="gt_row gt_left">White</td>
+      <td class="gt_row gt_left">SUV</td>
+      <td class="gt_row gt_left">Toyota</td>
+      <td class="gt_row gt_left">Venza</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">Mon</td>
+      <td class="gt_row gt_center">18:26:09</td>
+      <td class="gt_row gt_center">TRUE</td>
+      <td class="gt_row gt_left">White</td>
+      <td class="gt_row gt_left">Truck</td>
+      <td class="gt_row gt_left">Chevy</td>
+      <td class="gt_row gt_left">Silverado</td>
+    </tr>
+  </tbody>
+  
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td colspan="7">
+        <p class="gt_footnote">
+          <sup class="gt_footnote_marks">
+            <em>1</em>
+          </sup>
+           
+          &lt;dttm&gt; converted to &lt;hms&gt; for display
+          <br />
+        </p>
+      </td>
+    </tr>
+  </tfoot>
+</table></div>
 <p>If you live in Texas, the below results shouldn’t come as a surprise.</p>
 <pre class="r"><code>rush_hour %&gt;% 
   unite(make_model, make, model, sep = &quot; &quot;) %&gt;% 
@@ -107,7 +465,7 @@ rush_hour %&gt;%
   slice_max(order_by = n, n = 10) %&gt;% 
   ggplot(aes(n, fct_reorder(make_model, n))) +
   geom_col()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.svg" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.svg" width="672" /></p>
 <p>Although <strong><code>rush_hour</code></strong> satisfies the need for realistic vehicle make/model frequencies, it cannot serve as a basis for inferring express lane traffic density since observations were obtained from Mopac mainlanes.</p>
 <p>To avoid further speculation, I made another trip to acquire express lane timestamps (collected during afternoon rush hour).</p>
 <pre class="r"><code>express_counts &lt;- read_csv(&quot;https://raw.githubusercontent.com/sccmckenzie/mopac/master/inst/extdata/express_counts.csv&quot;)
@@ -143,7 +501,7 @@ t_delta &lt;- express_counts %&gt;%
 
 t_delta %&gt;% 
   qplot(binwidth = 0.25) # histogram</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.svg" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.svg" width="672" /></p>
 <p>To simulate timestamps for <strong><code>express</code></strong>, we perform bootstrap sampling from the above distribution.</p>
 <pre class="r"><code># set timeframe (5am - 8pm)
 t1 &lt;- 5 
@@ -166,7 +524,7 @@ express %&gt;%
   summarize(volume = n()) %&gt;% 
   ggplot(aes(t15, volume)) +
   geom_line(aes(color = direction))</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.svg" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-10-1.svg" width="672" /></p>
 <p>While we have achieved some randomness, the consistent baseline around 150 is unrealistic. For example, around 6:00am, nobody is <em>actually</em> using the express lane.</p>
 <p>Luckily, I managed to find a table containing real traffic counts from the City of Austin Open Data Portal. The low-level details here aren’t super exciting - I’ve only included the code for the sake of reproducibility. Essentially, I am projecting the real traffic density profile onto the above baseline distribution.</p>
 <pre class="r"><code>steck &lt;- jsonlite::fromJSON(&#39;https://data.austintexas.gov/resource/sh59-i6y9.json?atd_device_id=6409&amp;year=2020&amp;month=5&amp;day=20&amp;heavy_vehicle=false&#39;) %&gt;% 
@@ -203,7 +561,7 @@ express %&gt;%
   summarize(volume = n()) %&gt;% 
   ggplot(aes(t15, volume)) +
   geom_line(aes(color = direction))</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.svg" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.svg" width="672" /></p>
 <p>Voila! The above distribution is much more believable: starting around 6am, traffic increases, levels out, and finally recedes around 6pm.</p>
 </div>
 <div id="step-4-trip-modeling" class="section level1">
@@ -232,7 +590,7 @@ scenario_1 &lt;- express %&gt;%
 scenario_1 %&gt;% 
   ggplot(aes(time)) + 
   geom_histogram(aes(fill = direction), binwidth = 900)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.svg" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.svg" width="672" /></p>
 <p>Note the above distribution contains roughly the same amount of north &amp; south observations.</p>
 <p>For <strong>Scenario 2</strong>, we’ll need to enforce actual equality between directions so that each north timestamp has a corresponding south timestamp.</p>
 <p>Each vehicle will contain 2 timestamps:</p>
@@ -265,7 +623,7 @@ bind_rows(
   ) %&gt;% 
   ggplot(aes(time)) +
   geom_histogram(aes(fill = grp))</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.svg" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.svg" width="672" /></p>
 <p>Notice there is some overlap between the A &amp; B distribution. This is intentional, as there will inevitably be some drivers that start their commute in the afternoon.</p>
 <p>Currently, there are no unique vehicles tying observations together between <strong><code>scenario_2A</code></strong> &amp; <strong><code>scenario_2B</code></strong>. Timestamp pairing is deceptively challenging if we wish to avoid inefficient for-loop structures. After some trial-and-error, I found the below procedure to work quite nicely:</p>
 <ol style="list-style-type: decimal">
@@ -311,7 +669,7 @@ scenario_2_sim %&gt;%
   ggplot(aes(l)) +
   geom_density(aes(color = factor(i))) +
   facet_wrap(~ direction, ncol = 1)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.svg" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.svg" width="672" /></p>
 <p>Most of these distributions appear normal. We’ll pick the one with the highest Shapiro-Wilk normality test statistic.</p>
 <pre class="r"><code>library(broom)
 
@@ -340,64 +698,402 @@ scenario_3 &lt;- express %&gt;%
   arrange(v_id, time)
 
 scenario_3 %&gt;% 
-  slice_head(n = 9) %&gt;% 
-  knitr::kable()</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="left">direction</th>
-<th align="left">time</th>
-<th align="right">v_id</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">North</td>
-<td align="left">2020-05-20 11:19:17</td>
-<td align="right">7001</td>
-</tr>
-<tr class="even">
-<td align="left">South</td>
-<td align="left">2020-05-20 15:07:51</td>
-<td align="right">7001</td>
-</tr>
-<tr class="odd">
-<td align="left">South</td>
-<td align="left">2020-05-20 17:54:40</td>
-<td align="right">7001</td>
-</tr>
-<tr class="even">
-<td align="left">South</td>
-<td align="left">2020-05-20 08:47:28</td>
-<td align="right">7002</td>
-</tr>
-<tr class="odd">
-<td align="left">South</td>
-<td align="left">2020-05-20 13:21:30</td>
-<td align="right">7002</td>
-</tr>
-<tr class="even">
-<td align="left">South</td>
-<td align="left">2020-05-20 17:14:47</td>
-<td align="right">7002</td>
-</tr>
-<tr class="odd">
-<td align="left">South</td>
-<td align="left">2020-05-20 13:08:55</td>
-<td align="right">7003</td>
-</tr>
-<tr class="even">
-<td align="left">South</td>
-<td align="left">2020-05-20 13:24:35</td>
-<td align="right">7003</td>
-</tr>
-<tr class="odd">
-<td align="left">South</td>
-<td align="left">2020-05-20 17:55:40</td>
-<td align="right">7003</td>
-</tr>
-</tbody>
-</table>
+  slice_head(n = 9)</code></pre>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#gkivvmrapv .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#gkivvmrapv .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#gkivvmrapv .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#gkivvmrapv .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#gkivvmrapv .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#gkivvmrapv .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#gkivvmrapv .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#gkivvmrapv .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#gkivvmrapv .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#gkivvmrapv .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#gkivvmrapv .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#gkivvmrapv .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#gkivvmrapv .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#gkivvmrapv .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#gkivvmrapv .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#gkivvmrapv .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#gkivvmrapv .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#gkivvmrapv .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gkivvmrapv .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#gkivvmrapv .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gkivvmrapv .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#gkivvmrapv .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#gkivvmrapv .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#gkivvmrapv .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#gkivvmrapv .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#gkivvmrapv .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#gkivvmrapv .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#gkivvmrapv .gt_left {
+  text-align: left;
+}
+
+#gkivvmrapv .gt_center {
+  text-align: center;
+}
+
+#gkivvmrapv .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#gkivvmrapv .gt_font_normal {
+  font-weight: normal;
+}
+
+#gkivvmrapv .gt_font_bold {
+  font-weight: bold;
+}
+
+#gkivvmrapv .gt_font_italic {
+  font-style: italic;
+}
+
+#gkivvmrapv .gt_super {
+  font-size: 65%;
+}
+
+#gkivvmrapv .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="gkivvmrapv" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">direction</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">time</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">v_id</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr>
+      <td class="gt_row gt_left">North</td>
+      <td class="gt_row gt_left">2020-05-20 11:19:17</td>
+      <td class="gt_row gt_center">7001</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">South</td>
+      <td class="gt_row gt_left">2020-05-20 15:07:51</td>
+      <td class="gt_row gt_center">7001</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">South</td>
+      <td class="gt_row gt_left">2020-05-20 17:54:40</td>
+      <td class="gt_row gt_center">7001</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">South</td>
+      <td class="gt_row gt_left">2020-05-20 08:47:28</td>
+      <td class="gt_row gt_center">7002</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">South</td>
+      <td class="gt_row gt_left">2020-05-20 13:21:30</td>
+      <td class="gt_row gt_center">7002</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">South</td>
+      <td class="gt_row gt_left">2020-05-20 17:14:47</td>
+      <td class="gt_row gt_center">7002</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">South</td>
+      <td class="gt_row gt_left">2020-05-20 13:08:55</td>
+      <td class="gt_row gt_center">7003</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">South</td>
+      <td class="gt_row gt_left">2020-05-20 13:24:35</td>
+      <td class="gt_row gt_center">7003</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">South</td>
+      <td class="gt_row gt_left">2020-05-20 17:55:40</td>
+      <td class="gt_row gt_center">7003</td>
+    </tr>
+  </tbody>
+  
+  
+</table></div>
 <p>All that remains is to exclude vehicles with unrealistic timestamps. This time, we’ll use a lower threshold of 1 hour.</p>
 <pre class="r"><code>scenario_3 &lt;- scenario_3 %&gt;%   
   group_by(v_id) %&gt;% 
@@ -474,62 +1170,420 @@ express &lt;- express %&gt;%
   inner_join(express, .) # join it all back with express
 
 express %&gt;% 
-  sample_n(5) %&gt;% 
-  knitr::kable()</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="left">direction</th>
-<th align="left">time</th>
-<th align="right">v_id</th>
-<th align="left">make</th>
-<th align="left">model</th>
-<th align="left">color</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">North</td>
-<td align="left">2020-05-20 14:32:48</td>
-<td align="right">4834</td>
-<td align="left">Porsche</td>
-<td align="left">Panamera</td>
-<td align="left">Black</td>
-</tr>
-<tr class="even">
-<td align="left">North</td>
-<td align="left">2020-05-20 05:40:34</td>
-<td align="right">5939</td>
-<td align="left">Infiniti</td>
-<td align="left">G37</td>
-<td align="left">White</td>
-</tr>
-<tr class="odd">
-<td align="left">North</td>
-<td align="left">2020-05-20 18:20:32</td>
-<td align="right">8654</td>
-<td align="left">Chevy</td>
-<td align="left">Silverado</td>
-<td align="left">Black</td>
-</tr>
-<tr class="even">
-<td align="left">South</td>
-<td align="left">2020-05-20 15:15:13</td>
-<td align="right">1557</td>
-<td align="left">Nissan</td>
-<td align="left">350Z</td>
-<td align="left">Silver</td>
-</tr>
-<tr class="odd">
-<td align="left">North</td>
-<td align="left">2020-05-20 15:21:27</td>
-<td align="right">2718</td>
-<td align="left">Honda</td>
-<td align="left">S-3000</td>
-<td align="left">Silver</td>
-</tr>
-</tbody>
-</table>
+  sample_n(5)</code></pre>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#trnmrngfnk .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#trnmrngfnk .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#trnmrngfnk .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#trnmrngfnk .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#trnmrngfnk .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#trnmrngfnk .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#trnmrngfnk .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#trnmrngfnk .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#trnmrngfnk .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#trnmrngfnk .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#trnmrngfnk .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#trnmrngfnk .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#trnmrngfnk .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#trnmrngfnk .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#trnmrngfnk .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#trnmrngfnk .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#trnmrngfnk .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#trnmrngfnk .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#trnmrngfnk .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#trnmrngfnk .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#trnmrngfnk .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#trnmrngfnk .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#trnmrngfnk .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#trnmrngfnk .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#trnmrngfnk .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#trnmrngfnk .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#trnmrngfnk .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#trnmrngfnk .gt_left {
+  text-align: left;
+}
+
+#trnmrngfnk .gt_center {
+  text-align: center;
+}
+
+#trnmrngfnk .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#trnmrngfnk .gt_font_normal {
+  font-weight: normal;
+}
+
+#trnmrngfnk .gt_font_bold {
+  font-weight: bold;
+}
+
+#trnmrngfnk .gt_font_italic {
+  font-style: italic;
+}
+
+#trnmrngfnk .gt_super {
+  font-size: 65%;
+}
+
+#trnmrngfnk .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="trnmrngfnk" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+  <thead class="gt_header">
+    <tr>
+      <th colspan="6" class="gt_heading gt_title gt_font_normal" style>express</th>
+    </tr>
+    <tr>
+      <th colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style></th>
+    </tr>
+  </thead>
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">direction</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">time<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">v_id</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">make</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">model</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">color</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr>
+      <td class="gt_row gt_left">North</td>
+      <td class="gt_row gt_center">16:39:07</td>
+      <td class="gt_row gt_center">4110</td>
+      <td class="gt_row gt_left">Infiniti</td>
+      <td class="gt_row gt_left">Q50</td>
+      <td class="gt_row gt_left">Grey</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">North</td>
+      <td class="gt_row gt_center">14:21:24</td>
+      <td class="gt_row gt_center">6070</td>
+      <td class="gt_row gt_left">Toyota</td>
+      <td class="gt_row gt_left">86</td>
+      <td class="gt_row gt_left">Black</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">South</td>
+      <td class="gt_row gt_center">05:21:24</td>
+      <td class="gt_row gt_center">6227</td>
+      <td class="gt_row gt_left">Honda</td>
+      <td class="gt_row gt_left">Ridgeline</td>
+      <td class="gt_row gt_left">Black</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">South</td>
+      <td class="gt_row gt_center">11:35:00</td>
+      <td class="gt_row gt_center">9265</td>
+      <td class="gt_row gt_left">Nissan</td>
+      <td class="gt_row gt_left">Pathfinder</td>
+      <td class="gt_row gt_left">Grey</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">North</td>
+      <td class="gt_row gt_center">11:24:39</td>
+      <td class="gt_row gt_center">7493</td>
+      <td class="gt_row gt_left">Toyota</td>
+      <td class="gt_row gt_left">4Runner</td>
+      <td class="gt_row gt_left">Black</td>
+    </tr>
+  </tbody>
+  
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td colspan="6">
+        <p class="gt_footnote">
+          <sup class="gt_footnote_marks">
+            <em>1</em>
+          </sup>
+           
+          &lt;dttm&gt; converted to &lt;hms&gt; for display
+          <br />
+        </p>
+      </td>
+    </tr>
+  </tfoot>
+</table></div>
 </div>
 <div id="step-6-plate-assignment" class="section level1">
 <h1>Step 6: Plate Assignment</h1>
@@ -554,62 +1608,420 @@ plates &lt;- str_c(plate_letters, plate_numbers, sep = &quot;-&quot;)</code></pr
   select(!v_id)
 
 express %&gt;% 
-  sample_n(5) %&gt;% 
-  knitr::kable()</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="left">direction</th>
-<th align="left">time</th>
-<th align="left">plate</th>
-<th align="left">make</th>
-<th align="left">model</th>
-<th align="left">color</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">North</td>
-<td align="left">2020-05-20 14:44:10</td>
-<td align="left">ZKV-1030</td>
-<td align="left">Subaru</td>
-<td align="left">BRZ</td>
-<td align="left">Grey</td>
-</tr>
-<tr class="even">
-<td align="left">South</td>
-<td align="left">2020-05-20 10:49:33</td>
-<td align="left">FNA-7147</td>
-<td align="left">Chevy</td>
-<td align="left">Camaro</td>
-<td align="left">Red</td>
-</tr>
-<tr class="odd">
-<td align="left">South</td>
-<td align="left">2020-05-20 11:37:16</td>
-<td align="left">SAB-6592</td>
-<td align="left">Hyundai</td>
-<td align="left">Santa Fe</td>
-<td align="left">Silver</td>
-</tr>
-<tr class="even">
-<td align="left">South</td>
-<td align="left">2020-05-20 14:59:38</td>
-<td align="left">RUY-4366</td>
-<td align="left">BMW</td>
-<td align="left">5-Series</td>
-<td align="left">Black</td>
-</tr>
-<tr class="odd">
-<td align="left">North</td>
-<td align="left">2020-05-20 12:44:53</td>
-<td align="left">VLJ-3169</td>
-<td align="left">Hyundai</td>
-<td align="left">Tucson</td>
-<td align="left">Grey</td>
-</tr>
-</tbody>
-</table>
+  sample_n(5)</code></pre>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#obeywnluri .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#obeywnluri .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#obeywnluri .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#obeywnluri .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#obeywnluri .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#obeywnluri .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#obeywnluri .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#obeywnluri .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#obeywnluri .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#obeywnluri .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#obeywnluri .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#obeywnluri .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#obeywnluri .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#obeywnluri .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#obeywnluri .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#obeywnluri .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#obeywnluri .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#obeywnluri .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#obeywnluri .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#obeywnluri .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#obeywnluri .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#obeywnluri .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#obeywnluri .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#obeywnluri .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#obeywnluri .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#obeywnluri .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#obeywnluri .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#obeywnluri .gt_left {
+  text-align: left;
+}
+
+#obeywnluri .gt_center {
+  text-align: center;
+}
+
+#obeywnluri .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#obeywnluri .gt_font_normal {
+  font-weight: normal;
+}
+
+#obeywnluri .gt_font_bold {
+  font-weight: bold;
+}
+
+#obeywnluri .gt_font_italic {
+  font-style: italic;
+}
+
+#obeywnluri .gt_super {
+  font-size: 65%;
+}
+
+#obeywnluri .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="obeywnluri" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+  <thead class="gt_header">
+    <tr>
+      <th colspan="6" class="gt_heading gt_title gt_font_normal" style>express</th>
+    </tr>
+    <tr>
+      <th colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style></th>
+    </tr>
+  </thead>
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">direction</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">time<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">plate</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">make</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">model</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">color</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr>
+      <td class="gt_row gt_left">South</td>
+      <td class="gt_row gt_center">12:58:12</td>
+      <td class="gt_row gt_left">MGW-5806</td>
+      <td class="gt_row gt_left">Toyota</td>
+      <td class="gt_row gt_left">Highlander</td>
+      <td class="gt_row gt_left">Silver</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">North</td>
+      <td class="gt_row gt_center">06:52:45</td>
+      <td class="gt_row gt_left">KFC-2235</td>
+      <td class="gt_row gt_left">Chevy</td>
+      <td class="gt_row gt_left">Equinox</td>
+      <td class="gt_row gt_left">Silver</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">South</td>
+      <td class="gt_row gt_center">16:35:19</td>
+      <td class="gt_row gt_left">ERM-6778</td>
+      <td class="gt_row gt_left">Kia</td>
+      <td class="gt_row gt_left">Soul</td>
+      <td class="gt_row gt_left">Grey</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">North</td>
+      <td class="gt_row gt_center">18:31:59</td>
+      <td class="gt_row gt_left">KCN-7443</td>
+      <td class="gt_row gt_left">Honda</td>
+      <td class="gt_row gt_left">Civic</td>
+      <td class="gt_row gt_left">Black</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left">North</td>
+      <td class="gt_row gt_center">14:30:58</td>
+      <td class="gt_row gt_left">EQP-1257</td>
+      <td class="gt_row gt_left">Jeep</td>
+      <td class="gt_row gt_left">Renegade</td>
+      <td class="gt_row gt_left">Silver</td>
+    </tr>
+  </tbody>
+  
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td colspan="6">
+        <p class="gt_footnote">
+          <sup class="gt_footnote_marks">
+            <em>1</em>
+          </sup>
+           
+          &lt;dttm&gt; converted to &lt;hms&gt; for display
+          <br />
+        </p>
+      </td>
+    </tr>
+  </tfoot>
+</table></div>
 </div>
 <div class="footnotes">
 <hr />

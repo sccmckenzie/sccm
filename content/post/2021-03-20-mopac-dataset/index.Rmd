@@ -8,8 +8,10 @@ tags:
 editor_options: 
   chunk_output_type: console
 ---
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 knitr::opts_chunk$set(message = FALSE, warning = FALSE, dev = "svglite")
+
+library(gt)
 ```
 
 
@@ -46,14 +48,26 @@ These photos present a clear opportunity to apply an Image Recognition ML algori
 
 The resulting dataset is named **`rush_hour`.**
 
-```{r cache=FALSE}
+```{r cache=FALSE, results='hide'}
 rush_hour <- read_csv("https://raw.githubusercontent.com/sccmckenzie/mopac/master/inst/extdata/rush_hour.csv")
 # also available in mopac::rush_hour
 
 rush_hour %>% 
-  sample_n(5) %>% 
-  knitr::kable()
+  sample_n(5)
 ```
+
+```{r echo = FALSE}
+rush_hour %>% 
+  sample_n(5) %>% 
+  mutate(across(where(is.POSIXct), hms::as_hms)) %>% 
+  gt() %>% 
+  tab_header(title = "rush_hour") %>% 
+  tab_footnote(
+    footnote = "<dttm> converted to <hms> for display",
+    locations = cells_column_labels(columns = vars(time))
+  )
+```
+
 
 If you live in Texas, the below results shouldn't come as a surprise.
 
@@ -414,7 +428,7 @@ Since the average driver is unlikely to use the express lane more than twice / d
 
 First, we shuffle the remaining rows in **`express`** and assign 3 timestamps per vehicle.
 
-```{r cache=TRUE}
+```{r cache=TRUE, results='hide'}
 set.seed(100)
 
 scenario_3 <- express %>% 
@@ -426,8 +440,13 @@ scenario_3 <- express %>%
   arrange(v_id, time)
 
 scenario_3 %>% 
+  slice_head(n = 9)
+```
+
+```{r echo = FALSE}
+scenario_3 %>% 
   slice_head(n = 9) %>% 
-  knitr::kable()
+  gt()
 ```
 
 All that remains is to exclude vehicles with unrealistic timestamps. This time, we'll use a lower threshold of 1 hour.
@@ -512,7 +531,7 @@ color_probs <- rush_hour %>%
 
 We use **`sample_n`** to assign make/model/color in a vectorized fashion. Here, **`dplyr`** allows us to seamlessly change grouping as we progress through the operation.
 
-```{r}
+```{r, results='hide'}
 set.seed(98)
 express <- express %>% 
   distinct(v_id) %>% 
@@ -530,10 +549,23 @@ express <- express %>%
   inner_join(express, .) # join it all back with express
 
 express %>% 
-  sample_n(5) %>% 
-  knitr::kable()
+  sample_n(5)
 ```
- 
+
+```{r echo=FALSE}
+express %>% 
+  sample_n(5) %>% 
+  mutate(across(where(is.POSIXct), round_date, unit = "second")) %>% 
+  mutate(across(where(is.POSIXct), hms::as_hms)) %>% 
+  gt() %>% 
+  tab_header(title = "express") %>% 
+  tab_footnote(
+    footnote = "<dttm> converted to <hms> for display",
+    locations = cells_column_labels(columns = vars(time))
+  )
+```
+
+
 # Step 6: Plate Assignment
 
 Investigating license plate statistics (e.g. from where are the most frequent out-of-state plates) is certainly worth investigating - but for now, I'm choosing to generate plates that solely adhere to Texas formatting: 3 characters + 4 numbers. Again, the tidyverse saves us from expensive for-loop operations.
@@ -554,7 +586,7 @@ plates <- str_c(plate_letters, plate_numbers, sep = "-")
 
 At last, **`plate`** replaces the role of **`v_id`**.
 
-```{r}
+```{r results='hide'}
 express <- express %>% 
   distinct(v_id) %>% 
   mutate(plate = plates) %>% 
@@ -563,8 +595,20 @@ express <- express %>%
   select(!v_id)
 
 express %>% 
+  sample_n(5)
+```
+
+```{r echo=FALSE}
+express %>% 
   sample_n(5) %>% 
-  knitr::kable()
+  mutate(across(where(is.POSIXct), round_date, unit = "second")) %>% 
+  mutate(across(where(is.POSIXct), hms::as_hms)) %>% 
+  gt() %>% 
+  tab_header(title = "express") %>% 
+  tab_footnote(
+    footnote = "<dttm> converted to <hms> for display",
+    locations = cells_column_labels(columns = vars(time))
+  )
 ```
 
 [^1]: Although public service vehicles like metro buses utilize the Express Lane, we will exclude them here.

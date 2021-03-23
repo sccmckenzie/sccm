@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='504.00pt' height='360.00pt' viewBox='0 0 504.00 360.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHw1MDQuMDB8MC4wMHwzNjAuMDA='>
+    <rect x='0.00' y='0.00' width='504.00' height='360.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw1MDQuMDB8MC4wMHwzNjAuMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpOTUuMjR8NDk4LjUyfDgwLjI4fDM1NC41Mg=='>
+    <rect x='95.24' y='80.28' width='403.28' height='274.24' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpOTUuMjR8NDk4LjUyfDgwLjI4fDM1NC41Mg==)'>
+<polyline points='95.24,354.52 95.24,80.28 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='195.33,354.52 195.33,80.28 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='295.41,354.52 295.41,80.28 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='395.50,354.52 395.50,80.28 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='495.59,354.52 495.59,80.28 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<rect x='95.24' y='85.30' width='403.28' height='30.10' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #A5C261;' />
+<rect x='95.24' y='118.74' width='384.95' height='30.10' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #A5C261;' />
+<rect x='95.24' y='152.18' width='320.79' height='30.10' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #A5C261;' />
+<rect x='95.24' y='185.63' width='261.22' height='30.10' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #A5C261;' />
+<rect x='95.24' y='219.07' width='233.72' height='30.10' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #A5C261;' />
+<rect x='95.24' y='252.52' width='224.55' height='30.10' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #A5C261;' />
+<rect x='95.24' y='285.96' width='197.06' height='30.10' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #A5C261;' />
+<rect x='95.24' y='319.40' width='187.89' height='30.10' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #A5C261;' />
+</g>
+<g clip-path='url(#cpMC4wMHw1MDQuMDB8MC4wMHwzNjAuMDA=)'>
+<text x='95.24' y='75.35' text-anchor='middle' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='17.34px' lengthAdjust='spacingAndGlyphs'>0%</text>
+<text x='195.33' y='75.35' text-anchor='middle' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='17.34px' lengthAdjust='spacingAndGlyphs'>4%</text>
+<text x='295.41' y='75.35' text-anchor='middle' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='17.34px' lengthAdjust='spacingAndGlyphs'>8%</text>
+<text x='395.50' y='75.35' text-anchor='middle' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='24.02px' lengthAdjust='spacingAndGlyphs'>12%</text>
+<text x='495.59' y='75.35' text-anchor='middle' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='24.02px' lengthAdjust='spacingAndGlyphs'>16%</text>
+<text x='90.31' y='338.75' text-anchor='end' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='16.01px' lengthAdjust='spacingAndGlyphs'>Ice</text>
+<text x='90.31' y='305.31' text-anchor='end' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='50.03px' lengthAdjust='spacingAndGlyphs'>Light rum</text>
+<text x='90.31' y='271.86' text-anchor='end' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='36.70px' lengthAdjust='spacingAndGlyphs'>Lemon</text>
+<text x='90.31' y='238.42' text-anchor='end' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='64.71px' lengthAdjust='spacingAndGlyphs'>Lemon juice</text>
+<text x='90.31' y='204.98' text-anchor='end' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='68.05px' lengthAdjust='spacingAndGlyphs'>Orange juice</text>
+<text x='90.31' y='171.53' text-anchor='end' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='32.03px' lengthAdjust='spacingAndGlyphs'>Sugar</text>
+<text x='90.31' y='138.09' text-anchor='end' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='18.68px' lengthAdjust='spacingAndGlyphs'>Gin</text>
+<text x='90.31' y='104.64' text-anchor='end' style='font-size: 12.00px; fill: #4D4D4D; font-family: Arial;' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>Vodka</text>
+<text x='5.48' y='38.55' style='font-size: 15.00px; font-family: Arial;' textLength='95.02px' lengthAdjust='spacingAndGlyphs'>% Occurrence</text>
+<text x='5.48' y='18.37' style='font-size: 18.00px; font-family: Arial;' textLength='192.08px' lengthAdjust='spacingAndGlyphs'>Top Cocktail Ingredients</text>
+</g>
+</svg>
