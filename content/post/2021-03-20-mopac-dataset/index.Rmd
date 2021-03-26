@@ -474,14 +474,14 @@ robbery_A <- express %>%
   anti_join(scenario_2) %>% 
   anti_join(scenario_3) %>% 
   sample_n(size = 2, weight = dnorm(hourday(time), mean = 12, sd = 0.1)) %>% 
-  mutate(v_id = max(scenario_2$v_id) + row_number())
+  mutate(v_id = max(scenario_3$v_id) + row_number())
 
 robbery_B <- express %>% 
   anti_join(scenario_1) %>% 
   anti_join(scenario_2) %>% 
   anti_join(scenario_3) %>% 
   sample_n(size = 2, weight = dnorm(hourday(time), mean = 17, sd = 0.1)) %>% 
-  mutate(v_id = max(scenario_2$v_id) + row_number())
+  mutate(v_id = max(scenario_3$v_id) + row_number())
 
 robbery <- bind_rows(robbery_A, robbery_B)
 ```
