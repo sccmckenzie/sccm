@@ -503,7 +503,7 @@ express <- express %>%
 
 We've successfully assigned a **`v_id`** to each timestamp - but **`v_id`** is only an integer. Now, we need to assign vehicle make/model/color to each **`v_id`**.
 
-It's finally time to leverage **`rush_hour``** from Step 1.
+It's finally time to leverage **`rush_hour`** from Step 1.
 
 For simplicity, we'll assume the true frqeuency for each make/model does not depend upon day of the week. Hence, we treat each day as an independent sample. The below code calculates the weight of each make/model within each sample, then averages the weights between samples.
 
