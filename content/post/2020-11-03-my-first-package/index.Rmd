@@ -40,8 +40,6 @@ ggplot(df) +
 
 For more details, click [here](https://sccmckenzie.github.io/meandr/)!
 
-I also wrote a [detailed case study](https://sccmckenzie.github.io/meandr/articles/case.html) about the problem that originally inspired me to create this package.
-
 ## Reflections
 
 Altogether, this experience has given me an immense appreciation for how much work goes into package creation. If you've never created a package before, I highly suggest two resources:
