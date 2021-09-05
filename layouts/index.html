@@ -2,4 +2,46 @@
 <html lang="{{.Language}}">
 {{ partial "meta" . }}
 <body>
+  <header class="container no-print">
+	<div class="u-header">
+		{{ partial "navbar" . }}
+	</div>
+</header>
+<main class="container">
+<article>
+	<header>
+		{{ partial "title" . }}
+		{{ with .Content }}{{.}}{{ end }}
+	</header>
+	{{ $latestcount := .Site.Params.LatestCount | default 3 }}
+	<section>
+		<h4>{{ T "latestPost" }}</h4>
+		<ul class="no-bullet">
+			{{ $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+			{{- range (first $latestcount $pages) -}}
+			{{ partial "li" . }}
+			{{- end -}}
+		</ul>
+	</section>
+
+	{{ $pages := where site.RegularPages "Type" "in" .Site.Params.WorkSections }}
+	{{ if ne (len $pages) 0 }}
+	<section>
+		<h4>{{ T "latestWork" }}</h4>
+		<ul class="no-bullet">
+			{{- range (first $latestcount $pages) -}}
+			{{ partial "li" . }}
+			{{- end -}}
+		</ul>
+	</section>
+
+	{{ end }}
+
+	<section>
+	  <h4>Open-Source Projects</h4>
+	  <a href = "https://github.com/sccmckenzie/sift"><img src = "https://raw.githubusercontent.com/sccmckenzie/sift/main/man/figures/logo.png" width = 125 style = "display: inline-block"/></a>
+	  <a href = "https://github.com/sccmckenzie/mopac"><img src = "https://raw.githubusercontent.com/sccmckenzie/mopac/master/man/figures/logo.png" width = 125 style = "display: inline-block"/></a>
+	  <a href = "https://github.com/sccmckenzie/meandr"><img src = "https://raw.githubusercontent.com/sccmckenzie/meandr/master/man/figures/logo.png" width = 125 style = "display: inline-block"/></a>
+	</section>
+</article>
 {{ partial "footer" . }}
